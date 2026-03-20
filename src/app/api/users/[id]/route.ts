@@ -4,15 +4,15 @@ import User from '@/models/User';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         const { name, email, role, password } = await req.json();
-        const { id } = params;
 
         await connectDB();
         const user = await User.findById(id);
@@ -36,14 +36,13 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
         if (!session || (session.user as any).role !== 'admin') {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
-
-        const { id } = params;
 
         // Prevent deleting yourself
         if (id === (session.user as any).id) {
