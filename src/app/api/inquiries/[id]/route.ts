@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Inquiry from '@/models/Inquiry';
-import User from '@/models/User';
 
-// GET /api/inquiries/[id]
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+    req: Request, 
+    { params }: { params: Promise<{ id: string }> } 
+) {
     try {
         const { id } = await params;
         await connectDB();
@@ -16,8 +17,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 }
 
-// PATCH /api/inquiries/[id] — update status, assign, add note, add meeting
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(
+    req: Request, 
+    { params }: { params: Promise<{ id: string }> } 
+) {
     try {
         const { id } = await params;
         await connectDB();
