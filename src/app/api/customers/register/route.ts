@@ -27,8 +27,11 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // --- SMTP Email Configurations ---
-        // You should add EMAIL_USER and EMAIL_PASS to your .env.local
+        // --- Get Dynamic Base URL ---
+        const protocol = req.headers.get('x-forwarded-proto') || 'http';
+        const host = req.headers.get('host');
+        const baseUrl = process.env.NEXTAUTH_URL?.replace(/\/+$/, '') || `${protocol}://${host}`;
+
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -48,7 +51,7 @@ export async function POST(req: NextRequest) {
                         <p style="font-size: 16px; line-height: 1.6;">We've received your holiday inquiry and created a portal just for you. To view your itineraries and track your trip status, please complete your registration by setting up a secure password.</p>
                         
                         <div style="text-align: center; margin: 40px 0;">
-                            <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/register?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}" 
+                            <a href="${baseUrl}/register?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name || '')}" 
                                style="display: inline-block; background: #8b5cf6; color: white; padding: 16px 40px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);">
                                Complete Your Registration
                             </a>
