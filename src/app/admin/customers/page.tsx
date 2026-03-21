@@ -103,7 +103,7 @@ export default function CustomerManagementPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                     <div>
                         <h1 className="text-3xl font-extrabold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
-                            Customer Database
+                            Customer Data
                         </h1>
                         <p className="text-gray-400 mt-2">People who have submitted holiday inquiries</p>
                     </div>
@@ -130,70 +130,72 @@ export default function CustomerManagementPage() {
                     </div>
                 ) : (
                     <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden backdrop-blur-sm shadow-2xl animate-fade-in relative z-10">
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-800/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest border-b border-gray-800">
-                                <tr>
-                                    <th className="px-6 py-4">Customer</th>
-                                    <th className="px-6 py-4">Contact Info</th>
-                                    <th className="px-6 py-4 text-center">Inquiries</th>
-                                    <th className="px-6 py-4">Last Activity</th>
-                                    <th className="px-6 py-4 text-right">Records</th>
-                                    <th className="px-6 py-4 text-right">Email</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800">
-                                {filteredCustomers.map((customer) => (
-                                    <tr key={customer.email} className="hover:bg-purple-600/5 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20 flex items-center justify-center font-bold text-purple-400 capitalize">
-                                                    {customer.name.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-gray-100 group-hover:text-purple-300 transition-colors uppercase text-xs tracking-tight">{customer.name}</div>
-                                                    <div className="text-[11px] text-gray-500">{customer.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-400">
-                                            <div className="flex flex-col gap-1">
-                                                <div className="flex items-center gap-2"><Mail className="w-3 h-3 opacity-40" /> {customer.email}</div>
-                                                <div className="flex items-center gap-2"><Phone className="w-3 h-3 opacity-40" /> {customer.phone}</div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-800 border border-gray-700 text-sm font-black text-gray-300">
-                                                {customer.totalInquiries}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-sm text-gray-400">
-                                                <Calendar className="w-3 h-3 opacity-40 text-purple-400" />
-                                                {new Date(customer.lastInquiry).toLocaleDateString()}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button 
-                                                onClick={() => fetchHistory(customer)}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-purple-600 border border-gray-700 hover:border-purple-500 rounded-xl text-xs font-bold transition-all"
-                                            >
-                                                View History <ExternalLink className="w-3 h-3" />
-                                            </button>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button 
-                                                onClick={() => sendRegistrationEmail(customer)}
-                                                disabled={registering === customer.email}
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-500/20 hover:border-emerald-500 rounded-xl text-xs font-bold transition-all text-emerald-400 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
-                                            >
-                                                {registering === customer.email ? 'Sending...' : 'Send Login'} 
-                                                <Mail className={`w-3 h-3 ${registering === customer.email ? 'animate-pulse' : ''}`} />
-                                            </button>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[1000px]">
+                                <thead className="bg-gray-800/50 text-gray-400 text-[10px] uppercase font-bold tracking-widest border-b border-gray-800">
+                                    <tr>
+                                        <th className="px-6 py-4">Customer</th>
+                                        <th className="px-6 py-4">Contact Info</th>
+                                        <th className="px-6 py-4 text-center">Inquiries</th>
+                                        <th className="px-6 py-4">Last Activity</th>
+                                        <th className="px-6 py-4 text-right">Records</th>
+                                        <th className="px-6 py-4 text-right">Email</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {filteredCustomers.map((customer) => (
+                                        <tr key={customer.email} className="hover:bg-purple-600/5 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/20 flex items-center justify-center font-bold text-purple-400 capitalize">
+                                                        {customer.name.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-gray-100 group-hover:text-purple-300 transition-colors uppercase text-xs tracking-tight">{customer.name}</div>
+                                                        <div className="text-[11px] text-gray-500">{customer.email}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-400">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2"><Mail className="w-3 h-3 opacity-40" /> {customer.email}</div>
+                                                    <div className="flex items-center gap-2"><Phone className="w-3 h-3 opacity-40" /> {customer.phone}</div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-800 border border-gray-700 text-sm font-black text-gray-300">
+                                                    {customer.totalInquiries}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-sm text-gray-400">
+                                                    <Calendar className="w-3 h-3 opacity-40 text-purple-400" />
+                                                    {new Date(customer.lastInquiry).toLocaleDateString()}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button 
+                                                    onClick={() => fetchHistory(customer)}
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-purple-600 border border-gray-700 hover:border-purple-500 rounded-xl text-xs font-bold transition-all"
+                                                >
+                                                    View History <ExternalLink className="w-3 h-3" />
+                                                </button>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button 
+                                                    onClick={() => sendRegistrationEmail(customer)}
+                                                    disabled={registering === customer.email}
+                                                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600/10 hover:bg-emerald-600 border border-emerald-500/20 hover:border-emerald-500 rounded-xl text-xs font-bold transition-all text-emerald-400 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
+                                                >
+                                                    {registering === customer.email ? 'Sending...' : 'Send Login'} 
+                                                    <Mail className={`w-3 h-3 ${registering === customer.email ? 'animate-pulse' : ''}`} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </main>

@@ -130,61 +130,63 @@ export default function UserManagementPage() {
                     <LoadingSpinner text="Fetching staff users..." />
                 ) : (
                     <div className="bg-gray-900/50 border border-gray-800 rounded-2xl overflow-hidden backdrop-blur-sm">
-                        <table className="w-full text-left">
-                            <thead className="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4 font-semibold">Staff Member</th>
-                                    <th className="px-6 py-4 font-semibold">Role</th>
-                                    <th className="px-6 py-4 font-semibold">Created</th>
-                                    <th className="px-6 py-4 font-semibold text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800">
-                                {users.map((user) => (
-                                    <tr key={user._id} className="hover:bg-gray-800/30 transition-colors group">
-                                        <td className="px-6 py-5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-                                                    <UserIcon className="w-5 h-5 text-gray-400" />
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-gray-100">{user.name}</div>
-                                                    <div className="text-sm text-gray-500">{user.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-5">
-                                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${user.role === 'admin'
-                                                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                                                    : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                                }`}>
-                                                <Shield className="w-3 h-3" />
-                                                {user.role === 'admin' ? 'Administrator' : 'Customer Care'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-5 text-sm text-gray-400">
-                                            {new Date(user.createdAt).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-5 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(user)}
-                                                    className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all"
-                                                >
-                                                    <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user._id)}
-                                                    className="p-2 text-red-400/60 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left min-w-[800px]">
+                                <thead className="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider">
+                                    <tr>
+                                        <th className="px-6 py-4 font-semibold">Staff Member</th>
+                                        <th className="px-6 py-4 font-semibold">Role</th>
+                                        <th className="px-6 py-4 font-semibold">Created</th>
+                                        <th className="px-6 py-4 font-semibold text-right">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {users.map((user) => (
+                                        <tr key={user._id} className="hover:bg-gray-800/30 transition-colors group">
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                                                        <UserIcon className="w-5 h-5 text-gray-400" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold text-gray-100">{user.name}</div>
+                                                        <div className="text-sm text-gray-500">{user.email}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${user.role === 'admin'
+                                                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                                        : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                                    }`}>
+                                                    <Shield className="w-3 h-3" />
+                                                    {user.role === 'admin' ? 'Administrator' : 'Customer Care'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-5 text-sm text-gray-400">
+                                                {new Date(user.createdAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-6 py-5 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(user)}
+                                                        className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all"
+                                                    >
+                                                        <Edit2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user._id)}
+                                                        className="p-2 text-red-400/60 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </main>
