@@ -31,6 +31,7 @@ export default function AdminLoginPage() {
             const role = (session?.user as any)?.role;
             if (role === 'admin') router.push('/admin/dashboard');
             else if (role === 'customer_care') router.push('/customer-care/dashboard');
+            else if (role === 'customer') router.push('/customer/dashboard');
         }
     }, [status, session, router]);
 
@@ -77,19 +78,19 @@ export default function AdminLoginPage() {
                         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-purple-500/20">
                             <ShieldCheck className="w-8 h-8 text-white" />
                         </div>
-                        <h1 className="text-3xl font-extrabold mb-2">Staff Portal</h1>
-                        <p className="text-gray-500">Access limited to authorized travel Admins and admins.</p>
+                        <h1 className="text-3xl font-extrabold mb-2">User Portal</h1>
+                        <p className="text-gray-500">Log in to manage your inquiries or track your trips.</p>
                     </div>
 
                     <form onSubmit={handleLogin} className="glass p-8 rounded-3xl shadow-2xl space-y-6">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-400 ml-1">Work Email</label>
+                                <label className="text-sm font-semibold text-gray-400 ml-1">Email Address</label>
                                 <div className="relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                                     <input
                                         type="email"
-                                        placeholder="Admin@travelplanner.com"
+                                        placeholder="your@email.com"
                                         className="input-field pl-12"
                                         required
                                         value={formData.email}

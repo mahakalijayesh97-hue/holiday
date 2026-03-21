@@ -11,15 +11,39 @@ export async function GET(req: NextRequest) {
         const status = searchParams.get('status');
         const assignedTo = searchParams.get('assignedTo');
         const search = searchParams.get('search');
+        const email = searchParams.get('email');
 
         const filter: Record<string, any> = {};
         if (status) filter.status = status;
         if (assignedTo) filter.assignedTo = assignedTo;
+        if (email) filter.email = email;
 
-        if (search) {
+        // Security: If not admin/staff, only allow viewing own inquiries
+        const { getServerSession } = await import('next-auth');
+        const { authOptions } = await import('@/lib/auth');
+        const session = await getServerSession(authOptions);
+
+        if (!session) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const userRole = (session.user as any)?.role;
+        const userEmail = session.user?.email;
+
+        if (userRole === 'customer') {
+            // Force filter to only their own email
+            filter.email = userEmail;
+            // Remove other filters that might leak info
+            delete filter.assignedTo;
+            if (filter.$or) delete filter.$or;
+        }
+
+        if (search && userRole !== 'customer') {
             filter.$or = [
                 { inquiryId: { $regex: search, $options: 'i' } },
                 { name: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } },
             ];
         }
 
