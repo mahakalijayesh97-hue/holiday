@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, LayoutDashboard, Users, LogOut, Globe, Shield } from 'lucide-react';
+import { MapPin, LayoutDashboard, Users, LogOut, Globe, Shield, ChevronDown } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
+import { useState } from 'react';
 
 interface NavbarProps {
     variant?: 'public' | 'admin' | 'customer-care' | 'customer';
@@ -12,6 +13,7 @@ interface NavbarProps {
 export default function Navbar({ variant = 'public' }: NavbarProps) {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
     const adminLinks = [
         { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -53,32 +55,67 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
                 </Link>
 
                 <div className="flex items-center gap-4">
-                    {navLinks.map(({ href, label, icon: Icon }) => (
-                        <Link
-                            key={href}
-                            href={href}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${pathname === href
-                                    ? 'bg-purple-600 text-white'
-                                    : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                                }`}
-                        >
-                            <Icon className="w-4 h-4" />
-                            {label}
-                        </Link>
-                    ))}
+                    <div className="hidden md:flex items-center gap-4">
+                        {navLinks.map(({ href, label, icon: Icon }) => (
+                            <Link
+                                key={href}
+                                href={href}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${pathname === href
+                                        ? 'bg-purple-600 text-white'
+                                        : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                                    }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                {label}
+                            </Link>
+                        ))}
+                    </div>
 
                     {session ? (
-                        <div className="flex items-center gap-3">
-                            <span className="text-gray-400 text-sm hidden sm:block">
-                                {session.user?.name} <span className="text-purple-400 capitalize">({userRole?.replace('_', ' ')})</span>
-                            </span>
-                            <button
-                                onClick={() => signOut({ callbackUrl: '/login' })}
-                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition-all"
+                        <div className="relative">
+                            <button 
+                                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                className="flex items-center gap-2 group hover:bg-gray-800 px-3 py-1.5 rounded-2xl transition-all"
                             >
-                                <LogOut className="w-4 h-4" />
-                                <span className="hidden sm:block">Logout</span>
+                                <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 overflow-hidden relative group-hover:border-purple-500 transition-all shadow-lg">
+                                    <img 
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(session.user?.name || 'U')}&background=581c87&color=fff&bold=true`} 
+                                        alt="Avatar" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="flex flex-col -space-y-1 text-left hidden sm:flex">
+                                    <span className="text-white text-[11px] font-black uppercase tracking-tighter">
+                                        {session.user?.name}
+                                    </span>
+                                    <span className="text-purple-400 text-[9px] font-bold capitalize">
+                                        {userRole?.replace('_', ' ')}
+                                    </span>
+                                </div>
+                                <ChevronDown className={`w-3 h-3 text-gray-500 group-hover:text-purple-500 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
                             </button>
+
+                            {/* DROPDOWN MENU */}
+                            {showProfileMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-[60]" onClick={() => setShowProfileMenu(false)}></div>
+                                    <div className="absolute right-0 mt-3 w-56 bg-gray-950 border border-gray-800 rounded-2xl shadow-2xl z-[70] overflow-hidden backdrop-blur-3xl">
+                                        <div className="p-4 border-b border-gray-800 bg-purple-500/5">
+                                            <p className="text-xs font-black text-white uppercase tracking-widest">{session.user?.name}</p>
+                                            <p className="text-[10px] text-gray-500 lowercase">{session.user?.email}</p>
+                                        </div>
+                                        <div className="p-2">
+                                            <button
+                                                onClick={() => signOut({ callbackUrl: '/login' })}
+                                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all font-bold group"
+                                            >
+                                                <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                                                Logout
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     ) : (
                         <Link

@@ -87,7 +87,7 @@ export default function InquiryPage() {
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 transition-colors group-focus-within:text-purple-500" />
                                         <input
                                             type="text"
-                                            placeholder="John Doe"
+                                            placeholder="User Name"
                                             className="input-field pl-12"
                                             required
                                             value={formData.name}
@@ -117,7 +117,7 @@ export default function InquiryPage() {
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                                         <input
                                             type="email"
-                                            placeholder="john@example.com"
+                                            placeholder="User Email"
                                             className="input-field pl-12"
                                             required
                                             value={formData.email}

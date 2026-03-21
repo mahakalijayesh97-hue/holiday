@@ -208,7 +208,7 @@ export default function UserManagementPage() {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-                                    placeholder="John Doe"
+                                    placeholder="User Name"
                                 />
                             </div>
                             <div>
@@ -219,7 +219,7 @@ export default function UserManagementPage() {
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-                                    placeholder="john@travel.com"
+                                    placeholder="User Email"
                                 />
                             </div>
                             <div>
