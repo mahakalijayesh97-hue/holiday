@@ -8,7 +8,10 @@ import Navbar from '@/components/Navbar';
 import { Send, User, Phone, Mail, ShieldCheck, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { useSession } from 'next-auth/react';
+
 export default function InquiryPage() {
+    const { data: session } = useSession();
     const router = useRouter();
     const { selectedPlan, destination, days, setInquiryId } = usePlanStore();
     const [hasHydrated, setHasHydrated] = useState(false);
@@ -22,6 +25,17 @@ export default function InquiryPage() {
     useEffect(() => {
         setHasHydrated(true);
     }, []);
+
+    // AUTO-FILL FOR LOGGED IN CUSTOMERS
+    useEffect(() => {
+        if (session?.user) {
+            setFormData(prev => ({
+                ...prev,
+                name: prev.name || session.user?.name || '',
+                email: prev.email || session.user?.email || '',
+            }));
+        }
+    }, [session]);
 
     useEffect(() => {
         if (hasHydrated && !selectedPlan) {
@@ -87,7 +101,7 @@ export default function InquiryPage() {
                                         <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 transition-colors group-focus-within:text-purple-500" />
                                         <input
                                             type="text"
-                                            placeholder="John Doe"
+                                            placeholder="User Name"
                                             className="input-field pl-12"
                                             required
                                             value={formData.name}
@@ -117,7 +131,7 @@ export default function InquiryPage() {
                                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
                                         <input
                                             type="email"
-                                            placeholder="john@example.com"
+                                            placeholder="User Email"
                                             className="input-field pl-12"
                                             required
                                             value={formData.email}
