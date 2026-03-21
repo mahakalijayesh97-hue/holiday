@@ -8,7 +8,10 @@ import Navbar from '@/components/Navbar';
 import { Send, User, Phone, Mail, ShieldCheck, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { useSession } from 'next-auth/react';
+
 export default function InquiryPage() {
+    const { data: session } = useSession();
     const router = useRouter();
     const { selectedPlan, destination, days, setInquiryId } = usePlanStore();
     const [hasHydrated, setHasHydrated] = useState(false);
@@ -22,6 +25,17 @@ export default function InquiryPage() {
     useEffect(() => {
         setHasHydrated(true);
     }, []);
+
+    // AUTO-FILL FOR LOGGED IN CUSTOMERS
+    useEffect(() => {
+        if (session?.user) {
+            setFormData(prev => ({
+                ...prev,
+                name: prev.name || session.user?.name || '',
+                email: prev.email || session.user?.email || '',
+            }));
+        }
+    }, [session]);
 
     useEffect(() => {
         if (hasHydrated && !selectedPlan) {
