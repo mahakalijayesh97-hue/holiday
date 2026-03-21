@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, LayoutDashboard, Users, LogOut, Globe } from 'lucide-react';
+import { MapPin, LayoutDashboard, Users, LogOut, Globe, Shield } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 
 interface NavbarProps {
-    variant?: 'public' | 'admin' | 'customer-care';
+    variant?: 'public' | 'admin' | 'customer-care' | 'customer';
 }
 
 export default function Navbar({ variant = 'public' }: NavbarProps) {
@@ -15,13 +15,19 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
 
     const adminLinks = [
         { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/admin/users', label: 'Users', icon: Users },
+        { href: '/admin/customers', label: 'Customers', icon: Users },
+        { href: '/admin/users', label: 'Staff', icon: Shield },
     ];
 
     const ccLinks = [{ href: '/customer-care/dashboard', label: 'My Inquiries', icon: LayoutDashboard }];
+    const customerLinks = [{ href: '/customer/dashboard', label: 'My Trips', icon: LayoutDashboard }];
+    
     const userRole = (session?.user as any)?.role;
 
-    let navLinks = variant === 'admin' ? adminLinks : variant === 'customer-care' ? ccLinks : [];
+    let navLinks: any[] = [];
+    if (variant === 'admin') navLinks = adminLinks;
+    else if (variant === 'customer-care') navLinks = ccLinks;
+    else if (variant === 'customer') navLinks = customerLinks;
 
     // Auto-add dashboard link for logged-in users on the public site
     if (variant === 'public' && session) {
@@ -29,6 +35,8 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
             navLinks = [{ href: '/admin/dashboard', label: 'Admin Panel', icon: LayoutDashboard }];
         } else if (userRole === 'customer_care') {
             navLinks = [{ href: '/customer-care/dashboard', label: 'Staff Panel', icon: LayoutDashboard }];
+        } else if (userRole === 'customer') {
+            navLinks = [{ href: '/customer/dashboard', label: 'My Trips', icon: LayoutDashboard }];
         }
     }
 
