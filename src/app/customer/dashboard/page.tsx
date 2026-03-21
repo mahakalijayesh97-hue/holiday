@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { MapPin, Calendar, Clock, BaggageClaim, DollarSign, ChevronRight } from 'lucide-react';
@@ -93,9 +94,12 @@ export default function CustomerDashboard() {
                                 </div>
 
                                 <div className="pt-4 border-t border-gray-800 mt-auto">
-                                    <button className="w-full flex items-center justify-between text-xs font-bold text-purple-400 hover:text-white transition-all group-hover:px-2">
+                                    <Link 
+                                        href={`/customer/inquiry/${inq._id}`}
+                                        className="w-full flex items-center justify-between text-xs font-bold text-purple-400 hover:text-white transition-all group-hover:px-2"
+                                    >
                                         VIEW ITINERARY <ChevronRight className="w-4 h-4" />
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         ))}

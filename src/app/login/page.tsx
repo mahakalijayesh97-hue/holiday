@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import { LogIn, Mail, Lock, ShieldCheck, AlertCircle } from 'lucide-react';
+import { LogIn, Mail, Lock, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminLoginPage() {
@@ -13,6 +13,7 @@ export default function AdminLoginPage() {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '', captchaAnswer: '' });
     const [captcha, setCaptcha] = useState({ num1: 0, num2: 0, expected: 0 });
+    const [showPassword, setShowPassword] = useState(false);
 
     // Generate new captcha on mount or failed attempt
     const generateCaptcha = () => {
@@ -101,16 +102,24 @@ export default function AdminLoginPage() {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-400 ml-1">Password</label>
-                                <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                                <div className="relative group">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 group-focus-within:text-purple-400 transition-colors" />
                                     <input
-                                        type="password"
+                                        type={showPassword ? 'text' : 'password'}
                                         placeholder="••••••••"
-                                        className="input-field pl-12"
+                                        className="input-field pl-12 pr-12"
                                         required
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-400 transition-all p-1 hover:bg-gray-800 rounded-lg"
+                                        title={showPassword ? 'Hide password' : 'Show password'}
+                                    >
+                                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                    </button>
                                 </div>
                             </div>
 

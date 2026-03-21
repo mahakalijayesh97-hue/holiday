@@ -98,7 +98,7 @@ export default function CCDashboard() {
                         <h3 className="font-bold text-sm">My Inquiry Queue</h3>
                     </div>
                     <div className="p-2">
-                        <InquiryTable inquiries={inquiries} basePath="/admin" />
+                        <InquiryTable inquiries={inquiries} basePath="/customer-care" />
                     </div>
                 </div>
             </div>
