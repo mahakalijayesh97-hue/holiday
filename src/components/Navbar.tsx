@@ -86,7 +86,7 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
                             className="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all shadow-lg shadow-purple-500/20 flex items-center gap-2"
                         >
                             <Users className="w-4 h-4" />
-                            Admin Login
+                            Login
                         </Link>
                     )}
                 </div>
