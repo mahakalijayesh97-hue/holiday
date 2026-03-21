@@ -92,40 +92,40 @@ export default function InquiryDetailPage() {
                     {/* Main Info Columns */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Header Card */}
-                        <div className="glass p-8 rounded-3xl border-purple-500/20 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 px-6 py-3 bg-purple-600/20 text-purple-400 font-mono text-sm border-b border-l border-purple-500/30">
+                        <div className="glass p-6 md:p-8 rounded-3xl border-purple-500/20 relative overflow-hidden">
+                            <div className="md:absolute top-0 right-0 px-6 py-3 bg-purple-600/20 text-purple-400 font-mono text-sm border-b border-l border-purple-500/30 w-fit mb-6 md:mb-0 rounded-bl-2xl md:rounded-bl-none">
                                 {inquiry.inquiryId}
                             </div>
 
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-2xl font-bold">
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-6 pt-4 md:pt-0">
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-2xl font-bold shrink-0 shadow-lg shadow-purple-500/20">
                                     {inquiry.name.charAt(0)}
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-black">{inquiry.name}</h1>
-                                    <div className="flex gap-4 mt-1">
-                                        <span className="flex items-center gap-1.5 text-sm text-gray-500"><Mail className="w-3.5 h-3.5" /> {inquiry.email}</span>
-                                        <span className="flex items-center gap-1.5 text-sm text-gray-500"><Phone className="w-3.5 h-3.5" /> {inquiry.phone}</span>
+                                    <h1 className="text-2xl md:text-4xl font-black tracking-tight">{inquiry.name}</h1>
+                                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-6 mt-2">
+                                        <span className="flex items-center gap-1.5 text-xs md:text-sm text-gray-400 font-medium truncate max-w-[200px] md:max-w-none"><Mail className="w-3.5 h-3.5 text-purple-400" /> {inquiry.email}</span>
+                                        <span className="flex items-center gap-1.5 text-xs md:text-sm text-gray-400 font-medium"><Phone className="w-3.5 h-3.5 text-purple-400" /> {inquiry.phone}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-gray-800">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 md:p-6 border-t border-gray-800 bg-gray-900/20 rounded-2xl mt-4">
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Status</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1 tracking-widest">Status</p>
                                     <StatusBadge status={inquiry.status} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Destination</p>
-                                    <p className="text-sm font-bold flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-blue-400" /> {inquiry.destination}</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1 tracking-widest">Destination</p>
+                                    <p className="text-sm font-bold flex items-center gap-1 truncate"><MapPin className="w-3.5 h-3.5 text-blue-400" /> {inquiry.destination}</p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Duration</p>
-                                    <p className="text-sm font-bold">{inquiry.days} Days</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1 tracking-widest">Duration</p>
+                                    <p className="text-sm font-bold text-gray-200">{inquiry.days} <span className="text-gray-500 font-normal">Days</span></p>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Budget</p>
-                                    <p className="text-sm font-bold capitalize text-green-400">{inquiry.selectedPlan.budget}</p>
+                                    <p className="text-[10px] text-gray-500 uppercase font-black mb-1 tracking-widest">Budget</p>
+                                    <p className="text-sm font-black capitalize text-green-400">{inquiry.selectedPlan.budget}</p>
                                 </div>
                             </div>
                         </div>
