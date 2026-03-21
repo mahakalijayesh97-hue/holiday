@@ -547,12 +547,35 @@ export default function LandingPage() {
         @keyframes slideRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 
         /* ── Responsive ── */
-        @media (max-width: 860px) {
-          .lp-wrap { grid-template-columns: 1fr; padding: 0 20px; }
-          .lp-left { padding: 16px 0 0; }
-          .lp-right { padding: 16px 0 40px; }
+        @media (max-width: 1024px) {
+          .lp-wrap { grid-template-columns: 1fr; padding: 0 24px; max-width: 600px; }
+          .lp-left { padding: 40px 0 0; order: 2; }
+          .lp-right { padding: 40px 0 60px; order: 1; text-align: center; align-items: center; }
+          .hero-sub { margin-left: auto; margin-right: auto; }
+          .hero-badge { margin-left: auto; margin-right: auto; }
           .fc { display: none; }
           .globe-ring, .globe-ring-2 { display: none; }
+          .stats { justify-content: center; }
+        }
+
+        @media (max-width: 768px) {
+           .form-row { grid-template-columns: 1fr; gap: 16px; }
+        }
+
+        @media (max-width: 640px) {
+          .hero-h1 { font-size: 32px; }
+          .form-card { padding: 20px; }
+          .lp-root { overflow-y: auto; }
+          .globe-wrap svg { width: 100%; height: auto; max-width: 280px; }
+        }
+
+        @media (max-width: 480px) {
+          .hero-h1 { font-size: 28px; }
+          .form-card { padding: 16px; }
+          .globe-wrap svg { max-width: 240px; }
+          .s-val { font-size: 16px; }
+          .s-lbl { font-size: 8px; }
+          .lp-wrap { padding: 0 16px; }
         }
       `}</style>
 
