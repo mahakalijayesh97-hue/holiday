@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { usePlanStore } from '@/store/planStore';
 import StepIndicator from '@/components/StepIndicator';
 import Navbar from '@/components/Navbar';
-import { MapPin, Calendar, ArrowRight, Sparkles, Loader2, Star, Quote, Globe as GlobeIcon, Heart, Navigation, ShieldCheck } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight, Sparkles, Loader2, Star, Quote, Globe as GlobeIcon, Heart, Navigation, ShieldCheck, X } from 'lucide-react';
 import './carting.css';
 import toast from 'react-hot-toast';
 
@@ -159,6 +159,7 @@ export default function LandingPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState<Suggestion | null>(null);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [selTrip, setSelTrip] = useState<any>(null);
 
   const debouncedDest = useDebounce(dest, 350);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -412,7 +413,7 @@ export default function LandingPage() {
             <p className="gallery-subtitle">Check out our top picks for your next adventure</p>
           </div>
           <div className="hidden md:flex gap-2">
-            <span className="hero-badge" style={{ marginBottom: 0 }}>View All</span>
+            {/* <span className="hero-badge" style={{ marginBottom: 0 }}>View All</span> */}
           </div>
         </div>
 
@@ -467,7 +468,7 @@ export default function LandingPage() {
               image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80"
             }
           ].map((item, i) => (
-            <div key={i} className="rec-card">
+            <div key={i} className="rec-card" onClick={() => setSelTrip(item)}>
               <div className="rec-img-wrap">
                 <img src={item.image} alt={item.title} />
                 <div className="rec-price">{item.price}</div>
@@ -484,6 +485,53 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+      
+      {/* Trip Detail Modal */}
+      {selTrip && (
+        <div className="modal-root">
+          <div className="modal-backdrop" onClick={() => setSelTrip(null)} />
+          <div className="modal-panel">
+            <button className="modal-close" onClick={() => setSelTrip(null)}>
+              <X size={20} />
+            </button>
+            <div className="m-body">
+              <div className="m-img">
+                <img src={selTrip.image} alt={selTrip.title} />
+                <div className="m-badge">Recommended</div>
+              </div>
+              <div className="m-details">
+                <div className="m-header">
+                  <h2 className="m-title">{selTrip.title}</h2>
+                  <div className="m-loc"><MapPin size={14} /> {selTrip.dest}</div>
+                </div>
+                <div className="m-price-box">
+                  <span className="m-p-lbl">Package starting at</span>
+                  <span className="m-p-val">{selTrip.price}</span>
+                </div>
+                <div className="m-grid">
+                  <div className="m-gi">
+                    <Calendar size={18} />
+                    <div>
+                      <div className="m-gi-val">{selTrip.days}</div>
+                      <div className="m-gi-lbl">Trip Duration</div>
+                    </div>
+                  </div>
+                  <div className="m-gi">
+                    <Sparkles size={18} />
+                    <div>
+                      <div className="m-gi-val">{selTrip.type}</div>
+                      <div className="m-gi-lbl">Experience</div>
+                    </div>
+                  </div>
+                </div>
+                <p className="m-desc">
+                  Experience the magic of {selTrip.dest} with our premium curated tour package. Includes top-tier accommodation, local guidance, and tailored experiences for an unforgettable journey.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Customer Reviews Section */}
       <section className="gallery-section">
@@ -553,7 +601,7 @@ export default function LandingPage() {
             <p className="gallery-subtitle">Explore some of the most breathtaking destinations curated for you.</p>
           </div>
           <div className="hidden md:flex gap-2">
-            <span className="hero-badge" style={{ marginBottom: 0 }}>Discover More</span>
+            {/* <span className="hero-badge" style={{ marginBottom: 0 }}>Discover More</span> */}
           </div>
         </div>
 
