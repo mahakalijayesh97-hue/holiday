@@ -14,6 +14,7 @@ export interface ITravelPlan {
     description: string;
     budget: 'low' | 'medium' | 'high';
     estimatedCost: string;
+    accommodations: string;
     days: IDayPlan[];
     highlights: string[];
     bestFor: string;
@@ -61,6 +62,7 @@ const TravelPlanSchema = new Schema({
     description: String,
     budget: { type: String, enum: ['low', 'medium', 'high'] },
     estimatedCost: String,
+    accommodations: { type: String, default: '' },
     days: [DayPlanSchema],
     highlights: [String],
     bestFor: String,

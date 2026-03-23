@@ -57,6 +57,7 @@ Each plan object:
   "description": string,
   "budget": "low" | "medium" | "high",
   "estimatedCost": string,
+  "accommodations": string,
   "highlights": [string, string, string, string],
   "bestFor": string,
   "days": [
