@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { usePlanStore } from '@/store/planStore';
 import StepIndicator from '@/components/StepIndicator';
 import Navbar from '@/components/Navbar';
-import { MapPin, Calendar, ArrowRight, Sparkles, Loader2, Star, Quote } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight, Sparkles, Loader2, Star, Quote, Globe as GlobeIcon, Heart, Navigation, ShieldCheck } from 'lucide-react';
 import './carting.css';
 import toast from 'react-hot-toast';
 
@@ -404,7 +404,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-
+      {/* Recommended Section */}
       <section className="gallery-section">
         <div className="gallery-header">
           <div>
@@ -485,6 +485,7 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Customer Reviews Section */}
       <section className="gallery-section">
         <div className="gallery-header">
           <div>
@@ -544,7 +545,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Customer Reviews Section */}
+      {/* Gallery Section */}
       <section className="gallery-section">
         <div className="gallery-header">
           <div>
@@ -650,9 +651,67 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Footer Section */}
+      <footer className="footer">
+        <div className="footer-wrap">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <div className="footer-logo">
+                <span className="logo-icon">✈️</span>
+                <span className="logo-text">Holiday Planner</span>
+              </div>
+              <p className="footer-desc">
+                Your personal AI travel assistant. Creating unforgettable journeys with intelligent planning and curated experiences across the globe.
+              </p>
+              <div className="footer-socials">
+                <a href="#" className="social-btn"><GlobeIcon size={18} /></a>
+                <a href="#" className="social-btn"><Heart size={18} /></a>
+                <a href="#" className="social-btn"><Navigation size={18} /></a>
+                <a href="#" className="social-btn"><ShieldCheck size={18} /></a>
+              </div>
+            </div>
 
+            <div className="footer-col">
+              <h4>Services</h4>
+              <ul className="footer-nav">
+                <li><a href="#">AI Travel Planner</a></li>
+                <li><a href="#">Custom Itineraries</a></li>
+                <li><a href="#">Group Travel</a></li>
+                <li><a href="#">Corporate Trips</a></li>
+              </ul>
+            </div>
 
+            <div className="footer-col">
+              <h4>Support</h4>
+              <ul className="footer-nav">
+                <li><a href="#">Help Center</a></li>
+                <li><a href="#">Trip Tracking</a></li>
+                <li><a href="#">Community</a></li>
+                <li><a href="#">Contact Us</a></li>
+              </ul>
+            </div>
 
+            <div className="footer-col">
+              <h4>Contact</h4>
+              <div className="contact-item">
+                <MapPin size={16} className="contact-ico" />
+                <span>123 Travel Lane, Silicon Valley</span>
+              </div>
+              <div className="contact-item">
+                <Sparkles size={16} className="contact-ico" />
+                <span>mahakalijayesh97@gmail.com</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p className="copyright">© {new Date().getFullYear()} Holiday Planner. All rights reserved.</p>
+            <div className="bottom-links">
+              <a href="https://sm-software.in/">Designed & Developed by Shree Mahakali Software Pvt. Ltd.</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
