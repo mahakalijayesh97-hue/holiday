@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { usePlanStore } from '@/store/planStore';
 import StepIndicator from '@/components/StepIndicator';
 import Navbar from '@/components/Navbar';
-import { MapPin, Calendar, ArrowRight, Sparkles, Loader2 } from 'lucide-react';
+import { MapPin, Calendar, ArrowRight, Sparkles, Loader2, Star, Quote } from 'lucide-react';
+import './carting.css';
 import toast from 'react-hot-toast';
 
 interface Suggestion {
@@ -18,12 +19,12 @@ interface Suggestion {
 
 // ─── Floating destination cards ───────────────────────────────────────────────
 const DESTINATION_CARDS = [
-  { id: 1, name: 'Santorini',    country: 'Greece',        image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&q=80',  pos: { top: '14%',  left: '3%'  }, rotate: '-7deg',  delay: '0s',    badge: '🌊 Island'    },
-  { id: 2, name: 'Kyoto',        country: 'Japan',         image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=300&q=80',  pos: { top: '12%',  right: '3%' }, rotate: '6deg',   delay: '0.5s',  badge: '🌸 Cultural'  },
-  { id: 3, name: 'Machu Picchu', country: 'Peru',          image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=300&q=80',  pos: { top: '48%',  left: '2%'  }, rotate: '4deg',   delay: '1s',    badge: '🏔️ Adventure' },
-  { id: 4, name: 'Maldives',     country: 'Indian Ocean',  image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=300&q=80',  pos: { top: '46%',  right: '2%' }, rotate: '-5deg',  delay: '0.3s',  badge: '🏝️ Luxury'    },
-  { id: 5, name: 'Paris',        country: 'France',        image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&q=80',  pos: { bottom: '8%', left: '3%' }, rotate: '-4deg',  delay: '0.8s',  badge: '🗼 Romance'   },
-  { id: 6, name: 'Bali',         country: 'Indonesia',     image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=300&q=80',  pos: { bottom: '9%', right: '3%'}, rotate: '5deg',   delay: '0.6s',  badge: '🌴 Tropical'  },
+  { id: 1, name: 'Santorini', country: 'Greece', image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=300&q=80', pos: { top: '14%', left: '3%' }, rotate: '-7deg', delay: '0s', badge: '🌊 Island' },
+  { id: 2, name: 'Kyoto', country: 'Japan', image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=300&q=80', pos: { top: '12%', right: '3%' }, rotate: '6deg', delay: '0.5s', badge: '🌸 Cultural' },
+  { id: 3, name: 'Machu Picchu', country: 'Peru', image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=300&q=80', pos: { top: '48%', left: '2%' }, rotate: '4deg', delay: '1s', badge: '🏔️ Adventure' },
+  { id: 4, name: 'Maldives', country: 'Indian Ocean', image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=300&q=80', pos: { top: '46%', right: '2%' }, rotate: '-5deg', delay: '0.3s', badge: '🏝️ Luxury' },
+  { id: 5, name: 'Paris', country: 'France', image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300&q=80', pos: { bottom: '8%', left: '3%' }, rotate: '-4deg', delay: '0.8s', badge: '🗼 Romance' },
+  { id: 6, name: 'Bali', country: 'Indonesia', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=300&q=80', pos: { bottom: '9%', right: '3%' }, rotate: '5deg', delay: '0.6s', badge: '🌴 Tropical' },
 ];
 
 // ─── Globe helpers ────────────────────────────────────────────────────────────
@@ -67,17 +68,17 @@ function Globe({ size = 380, highlightLat, highlightLng }: { size?: number; high
       style={{ filter: `drop-shadow(0 0 ${size * 0.14}px rgba(109,40,217,0.55)) drop-shadow(0 0 ${size * 0.06}px rgba(56,189,248,0.3))` }}>
       <defs>
         <radialGradient id="gg" cx="38%" cy="32%" r="68%">
-          <stop offset="0%"   stopColor="#2d1f6e" />
-          <stop offset="45%"  stopColor="#160d3d" />
+          <stop offset="0%" stopColor="#2d1f6e" />
+          <stop offset="45%" stopColor="#160d3d" />
           <stop offset="100%" stopColor="#06041a" />
         </radialGradient>
         <radialGradient id="shine" cx="32%" cy="28%" r="52%">
-          <stop offset="0%"   stopColor="rgba(255,255,255,0.13)" />
+          <stop offset="0%" stopColor="rgba(255,255,255,0.13)" />
           <stop offset="100%" stopColor="rgba(255,255,255,0)" />
         </radialGradient>
         <radialGradient id="outerGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor="rgba(109,40,217,0.22)" />
-          <stop offset="70%"  stopColor="rgba(56,189,248,0.08)" />
+          <stop offset="0%" stopColor="rgba(109,40,217,0.22)" />
+          <stop offset="70%" stopColor="rgba(56,189,248,0.08)" />
           <stop offset="100%" stopColor="rgba(0,0,0,0)" />
         </radialGradient>
         <clipPath id="gc"><circle cx={cx} cy={cy} r={r} /></clipPath>
@@ -122,7 +123,7 @@ function Globe({ size = 380, highlightLat, highlightLng }: { size?: number; high
         <g>
           <circle cx={hl.x} cy={hl.y} r={r * 0.055} fill="#f0abfc" opacity="0.97" />
           <circle cx={hl.x} cy={hl.y} r={r * 0.055} fill="#f0abfc" opacity="0.15">
-            <animate attributeName="r" values={`${r*0.055};${r*0.13};${r*0.055}`} dur="1.4s" repeatCount="indefinite" />
+            <animate attributeName="r" values={`${r * 0.055};${r * 0.13};${r * 0.055}`} dur="1.4s" repeatCount="indefinite" />
             <animate attributeName="opacity" values="0.4;0;0.4" dur="1.4s" repeatCount="indefinite" />
           </circle>
         </g>
@@ -204,7 +205,7 @@ export default function LandingPage() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showDropdown || !suggestions.length) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIdx(i => Math.min(i + 1, suggestions.length - 1)); }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, 0)); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, 0)); }
     if (e.key === 'Enter') {
       // Allow form to submit naturally, but pick the highlighted item if any
       const idx = activeIdx >= 0 ? activeIdx : 0;
@@ -226,10 +227,10 @@ export default function LandingPage() {
     if (!target && suggestions.length > 0) {
       target = suggestions[0];
     }
-    
+
     // Fallback to raw text if still nothing (OpenAI will try to figure it out anyway)
     const cleanDest = target ? `${target.name}, ${target.country}` : dest;
-    
+
     setLoading(true);
     setDestination(cleanDest);
     setDays(numDays);
@@ -246,339 +247,6 @@ export default function LandingPage() {
 
   return (
     <>
-      <style>{`
-        /* @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap'); */
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        .lp-root {
-          min-height: 100vh; width: 100%;
-          background: #06080f;
-          font-family: 'DM Sans', sans-serif;
-          position: relative; overflow: hidden;
-        }
-
-        /* ── Background layers ── */
-        .lp-bg {
-          position: fixed; inset: 0; z-index: 0; pointer-events: none;
-          background:
-            radial-gradient(ellipse 80% 70% at 20% 50%, rgba(109,40,217,0.18) 0%, transparent 60%),
-            radial-gradient(ellipse 60% 55% at 80% 20%, rgba(56,189,248,0.10) 0%, transparent 55%),
-            radial-gradient(ellipse 50% 50% at 60% 80%, rgba(139,92,246,0.08) 0%, transparent 55%);
-        }
-
-        /* Star field */
-        .lp-stars {
-          position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-        }
-        .lp-stars::before, .lp-stars::after {
-          content: '';
-          position: absolute; inset: 0;
-          background-image:
-            radial-gradient(1.5px 1.5px at 15% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
-            radial-gradient(1px 1px at 75% 12%, rgba(255,255,255,0.4) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 42% 68%, rgba(255,255,255,0.45) 0%, transparent 100%),
-            radial-gradient(1px 1px at 88% 55%, rgba(255,255,255,0.35) 0%, transparent 100%),
-            radial-gradient(1px 1px at 8%  60%, rgba(255,255,255,0.4) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 62% 88%, rgba(255,255,255,0.3) 0%, transparent 100%),
-            radial-gradient(1px 1px at 52% 18%, rgba(255,255,255,0.45) 0%, transparent 100%),
-            radial-gradient(1px 1px at 28% 82%, rgba(255,255,255,0.3) 0%, transparent 100%),
-            radial-gradient(1px 1px at 93% 35%, rgba(255,255,255,0.35) 0%, transparent 100%),
-            radial-gradient(1.5px 1.5px at 35% 45%, rgba(255,255,255,0.25) 0%, transparent 100%);
-        }
-        .lp-stars::after {
-          transform: rotate(45deg) scale(1.4);
-          opacity: 0.4;
-        }
-
-        /* ── Floating cards ── */
-        .fc {
-          position: fixed; width: 162px; border-radius: 18px; overflow: hidden; z-index: 2;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.1);
-          animation: fc-float 6s ease-in-out infinite;
-          will-change: transform; cursor: default;
-          transition: box-shadow 0.3s ease;
-        }
-        .fc:hover {
-          box-shadow: 0 28px 70px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.15), 0 0 35px rgba(109,40,217,0.3);
-          z-index: 6;
-        }
-        .fc img { width: 100%; height: 108px; object-fit: cover; display: block; }
-        .fc-info {
-          background: rgba(8,11,22,0.97); backdrop-filter: blur(12px);
-          padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 6px;
-        }
-        .fc-name { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; color:#fff; }
-        .fc-country { font-size:10px; color:rgba(255,255,255,0.38); margin-top:1px; }
-        .fc-badge {
-          font-size:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
-          border-radius:100px; padding:3px 7px; color:rgba(255,255,255,0.5); white-space:nowrap; flex-shrink:0;
-        }
-        @keyframes fc-float {
-          0%,100% { translate: 0 0; }
-          50%      { translate: 0 -14px; }
-        }
-
-        /* ── Main layout ── */
-        .lp-wrap {
-          position: relative; z-index: 10;
-          min-height: 100vh;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: auto 1fr;
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 40px;
-        }
-
-        /* Navbar row spans full width */
-        .lp-nav-row {
-          grid-column: 1 / -1;
-        }
-
-        /* Left: Globe column */
-        .lp-left {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 20px 24px 60px 0;
-          gap: 16px;
-        }
-
-        /* Right: Content column */
-        .lp-right {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: 20px 0 60px 40px;
-          gap: 0;
-        }
-
-        /* ── Globe wrapper ── */
-        .globe-wrap {
-          position: relative;
-          display: flex; flex-direction: column; align-items: center;
-          gap: 12px;
-        }
-
-        .globe-ring {
-          position: absolute;
-          width: 420px; height: 420px;
-          border-radius: 50%;
-          border: 1px solid rgba(139,92,246,0.12);
-          animation: ring-spin 20s linear infinite;
-          pointer-events: none;
-        }
-        .globe-ring-2 {
-          width: 480px; height: 480px;
-          border: 1px dashed rgba(56,189,248,0.08);
-          animation-duration: 35s;
-          animation-direction: reverse;
-        }
-        @keyframes ring-spin { to { transform: rotate(360deg); } }
-
-        .globe-tagline {
-          font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
-          text-transform: uppercase; color: rgba(255,255,255,0.3);
-          text-align: center;
-        }
-
-        .globe-selected-label {
-          display: flex; align-items: center; gap: 7px;
-          background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25);
-          border-radius: 100px; padding: 6px 14px;
-          font-size: 12.5px; font-weight: 600; color: #c4b5fd;
-          animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
-
-        /* ── Right panel ── */
-        .hero-badge {
-          display: inline-flex; align-items: center; gap: 8px;
-          background: rgba(109,40,217,0.1); border: 1px solid rgba(109,40,217,0.3);
-          border-radius: 100px; padding: 5px 14px 5px 10px;
-          font-size: 12px; font-weight: 500; color: rgba(192,160,255,0.9);
-          margin-bottom: 22px; width: fit-content;
-          animation: slideRight 0.5s ease both;
-        }
-        .badge-dot {
-          width: 7px; height: 7px; background: #a78bfa; border-radius: 50%;
-          box-shadow: 0 0 8px #a78bfa, 0 0 16px rgba(167,139,250,0.4);
-          animation: pulse 2s ease infinite; flex-shrink: 0;
-        }
-        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
-
-        .hero-h1 {
-          font-family: 'Syne', sans-serif;
-          font-size: clamp(32px, 3.2vw, 52px);
-          font-weight: 800; line-height: 1.08;
-          color: #fff; letter-spacing: -0.03em;
-          margin-bottom: 16px;
-          animation: slideRight 0.6s 0.08s ease both;
-        }
-        .grad {
-          background: linear-gradient(130deg, #c084fc 0%, #818cf8 45%, #38bdf8 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-
-        .hero-sub {
-          font-size: 14.5px; line-height: 1.75; color: rgba(255,255,255,0.4);
-          margin-bottom: 28px; max-width: 400px;
-          animation: slideRight 0.6s 0.14s ease both;
-        }
-
-        /* ── Form card ── */
-        .form-card {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px; padding: 24px;
-          box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-          backdrop-filter: blur(20px);
-          animation: slideRight 0.7s 0.2s ease both;
-        }
-
-        .form-row {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
-        }
-
-        .f-label {
-          display: block; font-size: 10.5px; font-weight: 700;
-          letter-spacing: 0.09em; text-transform: uppercase;
-          color: rgba(255,255,255,0.28); margin-bottom: 7px;
-        }
-
-        .f-wrap { position: relative; }
-
-        .f-ico {
-          position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-          color: rgba(255,255,255,0.2); width: 14px; height: 14px;
-          pointer-events: none; z-index: 1;
-        }
-
-        .f-input, .f-select {
-          width: 100%;
-          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 10px; padding: 11px 12px 11px 36px;
-          font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-          color: #fff; outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-          appearance: none; -webkit-appearance: none;
-        }
-        .f-input::placeholder { color: rgba(255,255,255,0.17); }
-        .f-input:focus, .f-select:focus {
-          border-color: rgba(167,139,250,0.5);
-          box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
-          background: rgba(255,255,255,0.06);
-        }
-        .f-select option { background: #131624; color: #fff; }
-
-        /* Autocomplete */
-        .ac-wrap { position: relative; }
-        .ac-spin {
-          position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
-          color: rgba(255,255,255,0.3); width: 13px; height: 13px;
-          animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .dropdown {
-          position: absolute; top: calc(100% + 7px); left: 0; right: 0; z-index: 200;
-          background: rgba(11,14,26,0.98); border: 1px solid rgba(255,255,255,0.09);
-          border-radius: 13px; overflow: hidden;
-          box-shadow: 0 16px 50px rgba(0,0,0,0.65), 0 0 0 1px rgba(139,92,246,0.15);
-          backdrop-filter: blur(20px);
-          animation: dropIn 0.16s ease both;
-        }
-        @keyframes dropIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
-
-        .dd-item {
-          display: flex; align-items: center; gap: 10px;
-          padding: 10px 13px; cursor: pointer;
-          border-bottom: 1px solid rgba(255,255,255,0.04);
-          transition: background 0.12s;
-        }
-        .dd-item:last-child { border-bottom: none; }
-        .dd-item:hover, .dd-item.on { background: rgba(139,92,246,0.13); }
-        .dd-emoji { font-size: 19px; flex-shrink: 0; }
-        .dd-name { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:#fff; }
-        .dd-country { font-size:11px; color:rgba(255,255,255,0.37); margin-top:1px; }
-        .dd-arrow { margin-left:auto; color:rgba(255,255,255,0.18); font-size:12px; flex-shrink:0; }
-        .dd-empty { padding:14px; font-size:12.5px; color:rgba(255,255,255,0.3); text-align:center; font-style:italic; }
-
-        .sel-chip {
-          display: inline-flex; align-items: center; gap: 5px;
-          background: rgba(139,92,246,0.14); border: 1px solid rgba(139,92,246,0.28);
-          border-radius: 7px; padding: 3px 9px; font-size: 11.5px; color: #c4b5fd; margin-top: 5px;
-        }
-
-        /* CTA button */
-        .btn-go {
-          width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
-          padding: 13px 20px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-          color: #fff; border: none; border-radius: 12px; cursor: pointer;
-          background: linear-gradient(130deg, #7c3aed 0%, #4f46e5 55%, #0284c7 100%);
-          position: relative; overflow: hidden;
-          transition: transform 0.15s, box-shadow 0.2s;
-          box-shadow: 0 8px 28px rgba(109,60,220,0.4);
-        }
-        .btn-go::after {
-          content:''; position:absolute; inset:0;
-          background: linear-gradient(140deg, rgba(255,255,255,0.13) 0%, transparent 55%);
-          pointer-events:none;
-        }
-        .btn-go:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 14px 40px rgba(109,60,220,0.5); }
-        .btn-go:active:not(:disabled) { transform:translateY(0); }
-        .btn-go:disabled { opacity:0.5; cursor:not-allowed; }
-        .sp { width:16px; height:16px; border:2px solid rgba(255,255,255,0.25); border-top-color:#fff; border-radius:50%; animation:spin 0.65s linear infinite; }
-
-        /* Stats */
-        .stats {
-          display: flex; gap: 0; margin-top: 20px;
-          border-top: 1px solid rgba(255,255,255,0.06); padding-top: 18px;
-          animation: slideRight 0.7s 0.35s ease both;
-        }
-        .stat { flex:1; text-align:center; position:relative; }
-        .stat+.stat::before { content:''; position:absolute; left:0; top:10%; height:80%; width:1px; background:rgba(255,255,255,0.06); }
-        .s-val { font-family:'Syne',sans-serif; font-size:20px; font-weight:700; color:#fff; line-height:1; margin-bottom:4px; }
-        .s-lbl { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.27); }
-
-        /* ── Animations ── */
-        @keyframes slideRight { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-
-        /* ── Responsive ── */
-        @media (max-width: 1024px) {
-          .lp-wrap { grid-template-columns: 1fr; padding: 0 24px; max-width: 600px; }
-          .lp-left { padding: 40px 0 0; order: 2; }
-          .lp-right { padding: 40px 0 60px; order: 1; text-align: center; align-items: center; }
-          .hero-sub { margin-left: auto; margin-right: auto; }
-          .hero-badge { margin-left: auto; margin-right: auto; }
-          .fc { display: none; }
-          .globe-ring, .globe-ring-2 { display: none; }
-          .stats { justify-content: center; }
-        }
-
-        @media (max-width: 768px) {
-           .form-row { grid-template-columns: 1fr; gap: 16px; }
-        }
-
-        @media (max-width: 640px) {
-          .hero-h1 { font-size: 32px; }
-          .form-card { padding: 20px; }
-          .lp-root { overflow-y: auto; }
-          .globe-wrap svg { width: 100%; height: auto; max-width: 280px; }
-        }
-
-        @media (max-width: 480px) {
-          .hero-h1 { font-size: 28px; }
-          .form-card { padding: 16px; }
-          .globe-wrap svg { max-width: 240px; }
-          .s-val { font-size: 16px; }
-          .s-lbl { font-size: 8px; }
-          .lp-wrap { padding: 0 16px; }
-        }
-      `}</style>
-
       <div className="lp-root" ref={containerRef}>
         <div className="lp-bg" />
         <div className="lp-stars" />
@@ -735,6 +403,256 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+
+
+      <section className="gallery-section">
+        <div className="gallery-header">
+          <div>
+            <h2 className="gallery-title">Our <span className="grad">Recommended</span></h2>
+            <p className="gallery-subtitle">Check out our top picks for your next adventure</p>
+          </div>
+          <div className="hidden md:flex gap-2">
+            <span className="hero-badge" style={{ marginBottom: 0 }}>View All</span>
+          </div>
+        </div>
+
+        <div className="rec-grid">
+          {[
+            {
+              title: "Goa Beach Trip",
+              dest: "Goa, India",
+              price: "₹25,000",
+              days: "4 Days",
+              type: "Beach",
+              image: "https://s7ap1.scene7.com/is/image/incredibleindia/1-palolem-beach-goa-goa-city-hero?qlt=82&ts=1742182084999"
+            },
+            {
+              title: "Kerala Backwaters",
+              dest: "Kerala, India",
+              price: "₹35,000",
+              days: "7 Days",
+              type: "Culture",
+              image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuq7nc2jeceWsHZwqaHTsvMvG488pMxtNOTg&s"
+            },
+            {
+              title: "Bali Beachfront Villa",
+              dest: "Ubud, Indonesia",
+              price: "₹42,000",
+              days: "6 Days",
+              type: "Tropical",
+              image: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=400&q=80"
+            },
+            {
+              title: "Dubai Skyline Escape",
+              dest: "Dubai, UAE",
+              price: "₹55,000",
+              days: "5 Days",
+              type: "Luxury",
+              image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&q=80"
+            },
+            {
+              title: "Swiss Alps Retreat",
+              dest: "Zermatt, Switzerland",
+              price: "₹1,10,000",
+              days: "4 Days",
+              type: "Mountain",
+              image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80"
+            },
+            {
+              title: "Tokyo Urban Tour",
+              dest: "Shinjuku, Japan",
+              price: "₹68,000",
+              days: "7 Days",
+              type: "Culture",
+              image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=80"
+            }
+          ].map((item, i) => (
+            <div key={i} className="rec-card">
+              <div className="rec-img-wrap">
+                <img src={item.image} alt={item.title} />
+                <div className="rec-price">{item.price}</div>
+              </div>
+              <div className="rec-content">
+                <h3 className="rec-title">{item.title}</h3>
+                <div className="rec-dest"><MapPin size={12} /> {item.dest}</div>
+                <div className="rec-meta">
+                  <div className="rec-item">Duration <span className="rec-val">{item.days}</span></div>
+                  <div className="rec-item">Experience <span className="rec-val">{item.type}</span></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="gallery-section">
+        <div className="gallery-header">
+          <div>
+            <h2 className="gallery-title">Customer <span className="grad">Reviews</span></h2>
+            <p className="gallery-subtitle">What our customers say about us</p>
+          </div>
+        </div>
+
+        <div className="reviews-grid">
+          {[
+            {
+              name: 'Sarah Jenkins',
+              location: 'United Kingdom',
+              avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
+              text: 'The AI-generated plan for our Bali trip was absolutely spot on. Every recommendation felt like it was handpicked by a local expert. Highly recommend!',
+              dest: 'Ubud, Bali',
+              tripImage: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&q=80'
+            },
+            {
+              name: 'Rajesh Mehta',
+              location: 'India',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
+              text: 'I was skeptical about AI planning but the Mumbai itinerary was surprisingly comprehensive. We discovered hidden gems we never would have found ourselves.',
+              dest: 'Mumbai, India',
+              tripImage: 'https://thumbs.dreamstime.com/b/gate-way-india-mumbai-flag-flying-mubai-independence-day-republic-inda-celebration-169248532.jpg'
+            },
+            {
+              name: 'Elena Rodriguez',
+              location: 'Spain',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80',
+              text: 'Breathtaking experience in Iceland! The smart routing helped us maximize our time under the Northern Lights. Simple, fast, and very effective.',
+              dest: 'Reykjavik, Iceland',
+              tripImage: 'https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=200&q=80'
+            }
+          ].map((r, i) => (
+            <div key={i} className="rv-card flex flex-col">
+              <div className="rv-header">
+                <img src={r.avatar} alt={r.name} className="rv-avatar" />
+                <div className="rv-info">
+                  <div className="rv-user-name">{r.name}</div>
+                  <div className="rv-user-loc">{r.location}</div>
+                </div>
+              </div>
+              <div className="rv-rating">
+                {[...Array(5)].map((_, j) => <Star key={j} fill="#facc15" stroke="none" size={14} />)}
+              </div>
+              <p className="rv-text">{r.text}</p>
+              <div className="rv-footer">
+                <div className="rv-dest">
+                  <MapPin size={12} />
+                  {r.dest}
+                </div>
+                <img src={r.tripImage} className="rv-trip-img" alt="Trip context" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Customer Reviews Section */}
+      <section className="gallery-section">
+        <div className="gallery-header">
+          <div>
+            <h2 className="gallery-title">Gallery <span className="grad">Images</span></h2>
+            <p className="gallery-subtitle">Explore some of the most breathtaking destinations curated for you.</p>
+          </div>
+          <div className="hidden md:flex gap-2">
+            <span className="hero-badge" style={{ marginBottom: 0 }}>Discover More</span>
+          </div>
+        </div>
+
+        <div className="gallery-grid">
+          <div className="gi gi-w2 gi-h2">
+            <img src="https://thumbs.dreamstime.com/b/gate-way-india-mumbai-flag-flying-mubai-independence-day-republic-inda-celebration-169248532.jpg" alt="Mumbai" />
+            <div className="gi-badge">✨ Trending</div>
+            <div className="gi-overlay">
+              <div className="gi-name">Mumbai</div>
+              <div className="gi-country">India</div>
+            </div>
+          </div>
+
+          <div className="gi">
+            <img src="https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&q=80" alt="Santorini" />
+            <div className="gi-overlay">
+              <div className="gi-name">Santorini</div>
+              <div className="gi-country">Greece</div>
+            </div>
+          </div>
+
+          <div className="gi">
+            <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80" alt="Kyoto" />
+            <div className="gi-overlay">
+              <div className="gi-name">Kyoto</div>
+              <div className="gi-country">Japan</div>
+            </div>
+          </div>
+
+          <div className="gi gi-w2">
+            <img src="https://static.independent.co.uk/2025/07/30/13/15/iStock-1339814820.jpeg" alt="Cappadocia" />
+            <div className="gi-overlay">
+              <div className="gi-name">Cappadocia</div>
+              <div className="gi-country">Turkey</div>
+            </div>
+          </div>
+
+          <div className="gi">
+            <img src="https://images.unsplash.com/photo-1526392060635-9d6019884377?w=400&q=80" alt="Machu Picchu" />
+            <div className="gi-overlay">
+              <div className="gi-name">Machu Picchu</div>
+              <div className="gi-country">Peru</div>
+            </div>
+          </div>
+
+          <div className="gi">
+            <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=400&q=80" alt="Amalfi Coast" />
+            <div className="gi-badge">💎 Luxury</div>
+            <div className="gi-overlay">
+              <div className="gi-name">Amalfi Coast</div>
+              <div className="gi-country">Italy</div>
+            </div>
+          </div>
+
+          <div className="gi gi-w2">
+            <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=400&q=80" alt="Maldives" />
+            <div className="gi-overlay">
+              <div className="gi-name">Maldives</div>
+              <div className="gi-country">Indian Ocean</div>
+            </div>
+          </div>
+
+          <div className="gi gi-w2">
+            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80" alt="Paris" />
+            <div className="gi-overlay">
+              <div className="gi-name">Paris</div>
+              <div className="gi-country">France</div>
+            </div>
+          </div>
+
+          <div className="gi gi-h2">
+            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80" alt="Bali" />
+            <div className="gi-overlay">
+              <div className="gi-name">Bali</div>
+              <div className="gi-country">Indonesia</div>
+            </div>
+          </div>
+
+          <div className="gi gi-h2">
+            <img src="https://img.freepik.com/premium-photo/beach-goa-india_78361-4735.jpg?semt=ais_hybrid&w=740&q=80" alt="Goa" />
+            <div className="gi-overlay">
+              <div className="gi-name">Goa</div>
+              <div className="gi-country">India</div>
+            </div>
+          </div>
+
+          <div className="gi gi-w2">
+            <img src="https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=800&q=80" alt="Iceland" />
+            <div className="gi-overlay">
+              <div className="gi-name">Iceland</div>
+              <div className="gi-country">Northern Lights, Reykjavik</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+
+
     </>
   );
 }
