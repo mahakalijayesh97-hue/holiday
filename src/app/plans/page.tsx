@@ -1,30 +1,73 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { usePlanStore } from '@/store/planStore';
 import StepIndicator from '@/components/StepIndicator';
+import { ITravelPlan } from '@/models/Inquiry';
 import Navbar from '@/components/Navbar';
 import PlanCard from '@/components/PlanCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { ArrowLeft, Sparkles, Map, Info, Compass, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Sparkles, Map, Info, Compass, CheckCircle2, ArrowRight, MapPin, Gem } from 'lucide-react';
 
 export default function PlansPage() {
     const router = useRouter();
-    const { plans, destination, setSelectedPlan, selectedPlan } = usePlanStore();
+    const searchParams = useSearchParams();
+    const destination = searchParams.get('destination') || '';
+    const days = searchParams.get('days') || '1';
+    const budget = searchParams.get('budget') || 'medium';
+
+    const { selectedPlan, setSelectedPlan } = usePlanStore(); 
+
+    const [plans, setPlans] = useState<ITravelPlan[]>([]);
+    const [loading, setLoading] = useState(true);
     const [hasHydrated, setHasHydrated] = useState(false);
+    const [masterData, setMasterData] = useState<any>(null);
     
     useEffect(() => {
         setHasHydrated(true);
     }, []);
 
     useEffect(() => {
-        if (hasHydrated && plans.length === 0) {
+        const fetchEverything = async () => {
+            if (!destination) {
+                setLoading(false); 
+                router.replace('/');
+                return;
+            }
+            setLoading(true);
+            try {
+                // Fetch registry info for context
+                const masterRes = await fetch(`/api/destinations?name=${encodeURIComponent(destination)}`);
+                const masterJson = await masterRes.json();
+                if (masterJson.destinations?.length > 0) setMasterData(masterJson.destinations[0]);
+
+                // Generate plans (will be DB-driven if possible)
+                const res = await fetch('/api/plans/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ destination, days, budget }),
+                });
+                const data = await res.json();
+                if (data.plans) setPlans(data.plans);
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                setPlans([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (hasHydrated) fetchEverything();
+    }, [hasHydrated, destination, days, budget]);
+
+    useEffect(() => {
+        if (hasHydrated && plans.length === 0 && !loading && destination) {
             router.push('/');
         }
-    }, [hasHydrated, plans, router]);
+    }, [hasHydrated, plans, loading, router, destination]);
 
-    if (!hasHydrated || (plans.length === 0 && hasHydrated)) return <LoadingSpinner text="Gathering itineraries..." />;
+    if (!hasHydrated || loading) return <LoadingSpinner text="Gathering itineraries..." />;
 
     const handleConfirmSelection = () => {
         if (selectedPlan) {
@@ -40,10 +83,9 @@ export default function PlansPage() {
             <div className="fixed inset-0 z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[120px] rounded-full" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/5 blur-[100px] rounded-full" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none" />
             </div>
 
-            <main className="relative z-10 max-w-7xl mx-auto px-6 pt-12 pb-32">
+            <main className="relative z-10 max-w-7xl mx-auto px-6 pb-24 pt-32">
                 <StepIndicator currentStep={2} />
 
                 {/* Header Section */}
@@ -64,21 +106,40 @@ export default function PlansPage() {
                                <h1 className="text-4xl md:text-5xl font-black tracking-tighter">
                                    Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">{destination}</span>
                                </h1>
-                               <p className="text-gray-500 font-medium mt-1">Found 5 AI-orchestrated paths for your adventure.</p>
+                               <div className="flex items-center gap-3 mt-1">
+                                    <p className="text-gray-500 font-medium">Found 5 tailored paths for your adventure.</p>
+                                    {masterData && (
+                                        <>
+                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500/30" />
+                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
+                                                <MapPin className="w-3 h-3 text-indigo-400" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-300">
+                                                    {masterData.district}, {masterData.region}
+                                                </span>
+                                            </div>
+                                        </>
+                                    )}
+                               </div>
                            </div>
                         </div>
                     </div>
 
                     <div className="flex flex-col items-end gap-3">
                         <div className="flex items-center gap-6 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl">
+                            {masterData && (
+                                <div className="flex items-center gap-2 mr-2">
+                                    <Sparkles className="w-3 h-3 text-amber-400" />
+                                    <span className="text-[10px] font-black uppercase tracking-tighter text-amber-400/80">Premium Registry Data</span>
+                                </div>
+                            )}
                            <div className="text-center">
                                <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Duration</div>
-                               <div className="text-sm font-bold">{plans[0]?.days.length} Days</div>
+                               <div className="text-sm font-bold">{days} Days</div>
                            </div>
                            <div className="w-px h-8 bg-white/10" />
                            <div className="text-center">
-                               <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Type</div>
-                               <div className="text-sm font-bold">Leisure</div>
+                               <div className="text-[10px] font-black uppercase text-gray-500 tracking-widest">Budget</div>
+                               <div className="text-sm font-bold capitalize">{budget}</div>
                            </div>
                         </div>
                     </div>
@@ -86,7 +147,7 @@ export default function PlansPage() {
 
                 {/* Plans Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-                    {plans.map((plan, idx) => (
+                    {plans.map((plan: ITravelPlan, idx: number) => (
                         <div key={plan.id} style={{ animationDelay: `${idx * 100}ms` }} className="animate-in fade-in zoom-in-95 fill-mode-both">
                             <PlanCard
                                 plan={plan}
