@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePlanStore } from '@/store/planStore';
 import StepIndicator from '@/components/StepIndicator';
@@ -10,7 +10,7 @@ import PlanCard from '@/components/PlanCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { ArrowLeft, Sparkles, Map, Info, Compass, CheckCircle2, ArrowRight, MapPin, Gem } from 'lucide-react';
 
-export default function PlansPage() {
+function PlansPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const destination = searchParams.get('destination') || '';
@@ -183,5 +183,13 @@ export default function PlansPage() {
                 )}
             </main>
         </div>
+    );
+}
+
+export default function PlansPage() {
+    return (
+        <Suspense fallback={<LoadingSpinner text="Initializing plans..." />}>
+            <PlansPageContent />
+        </Suspense>
     );
 }
