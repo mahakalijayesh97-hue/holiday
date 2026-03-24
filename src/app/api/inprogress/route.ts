@@ -24,7 +24,7 @@ export async function GET() {
             }
         ]);
         
-        const customers = customer.filter((customer: any) => customer.status === 'Pending'); 
+        const customers = customer.filter((customer: any) => customer.status === 'In Progress'); 
 
         return NextResponse.json({ customers });
     } catch (error) {

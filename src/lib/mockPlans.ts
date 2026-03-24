@@ -8,7 +8,7 @@ import { ITravelPlan } from '@/models/Inquiry';
 // Region: Saurashtra
 // Region: Kutch
 
-const GUJARAT_CITY_DATA: Record<
+export const GUJARAT_CITY_DATA: Record<
   string,
   {
     district: string;
@@ -960,7 +960,7 @@ const GUJARAT_CITY_DATA: Record<
 };
 
 // ─── Non-Gujarat city data (existing global cities) ──────────────────────────
-const GLOBAL_CITY_DATA: Record<
+export const GLOBAL_CITY_DATA: Record<
   string,
   { morning: string; afternoon: string; evening: string; highlights: string[] }
 > = {
