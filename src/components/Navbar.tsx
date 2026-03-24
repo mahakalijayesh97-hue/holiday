@@ -24,6 +24,7 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
 
     const adminLinks = [
         { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { href: '/admin/destinations', label: 'Destinations', icon: MapPin },
         { href: '/admin/customers', label: 'Customers', icon: Users },
         { href: '/admin/users', label: 'Staff', icon: Shield },
     ];
