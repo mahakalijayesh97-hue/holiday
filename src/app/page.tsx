@@ -235,15 +235,15 @@ export default function LandingPage() {
     setLoading(true);
     setDestination(cleanDest);
     setDays(numDays);
-    setDestination(cleanDest); setDays(numDays);
-    try {
-      const res = await fetch('/api/plans/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ destination: cleanDest, days: numDays }) });
-      const data = await res.json();
-      if (!res.ok) { toast.error(data.error || 'Failed to generate plans', { duration: 5000 }); return; }
-      if (data.plans?.length) { setPlans(data.plans); router.push('/plans'); }
-      else toast.error('No plans returned. Please try again.');
-    } catch { toast.error('Network error. Please check your connection.'); }
-    finally { setLoading(false); }
+
+    // Instant redirect: let the Plans page handle the fetching with query params
+    const params = new URLSearchParams({
+      destination: cleanDest,
+      days: numDays.toString(),
+      budget: 'medium'
+    });
+    
+    router.push(`/plans?${params.toString()}`);
   };
 
   return (

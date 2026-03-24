@@ -86,7 +86,14 @@ export default function AdminDashboard() {
             url:"/admin/customers"
         },
         { label: 'Total Inquiries', value: inquiries.length, icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-500/10' },
-        { label: 'Pending', value: inquiries.filter((i: any) => i.status === 'Pending').length, icon: Clock, color: 'text-red-400', bg: 'bg-yellow-500/10' },
+        { 
+            label: 'Pending', 
+            value: inquiries.filter((i: any) => i.status === 'Pending').length, 
+            icon: Clock, 
+            color: 'text-red-400', 
+            bg: 'bg-yellow-500/10',
+            url: "/admin/customers/pending"
+        },
         { 
             label: 'In Progress', 
             value: inquiries.filter((i: any) => i.status === 'In Progress').length, 

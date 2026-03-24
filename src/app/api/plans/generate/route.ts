@@ -1,7 +1,49 @@
 // app/api/plans/generate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { connectDB } from '@/lib/mongodb';
+import Destination from '@/models/Destination';
 import { generateMockPlans } from '@/lib/mockPlans';
+
+// ── Helper: generate plans from Database data ────────────────────────────────
+function generatePlansFromMaster(destName: string, days: number, master: any) {
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const name = master?.displayName || capitalize(destName);
+  
+  const categories = [
+    { id: 'plan-budget', type: 'Budget Explorer', budget: 'low' as const, hotelCat: 'budget' as const, description: `The most authentic, low-cost way to experience ${name}.` },
+    { id: 'plan-comfort', type: 'Comfort Journey', budget: 'medium' as const, hotelCat: 'comfort' as const, description: `A perfectly balanced mid-range exploration of ${name}.` },
+    { id: 'plan-luxury', type: 'Luxury Escape', budget: 'high' as const, hotelCat: 'luxury' as const, description: `Elite accommodations and premium access to ${name}'s best.` },
+    { id: 'plan-adventure', type: 'Adventure Quest', budget: 'medium' as const, hotelCat: 'comfort' as const, description: `Active discovery and off-beat gems in ${name}.` },
+    { id: 'plan-cultural', type: 'Cultural Immersion', budget: 'medium' as const, hotelCat: 'comfort' as const, description: `Deep dive into the history, temples, and traditions of ${name}.` },
+  ];
+
+  return categories.map(cat => ({
+    id: cat.id,
+    title: `${name} ${cat.type}`,
+    description: cat.description,
+    budget: cat.budget,
+    estimatedCost: cat.budget === 'low' ? `₹${days * 1800}–₹${days * 2800}` : cat.budget === 'medium' ? `₹${days * 4000}–₹${days * 6500}` : `₹${days * 12000}–₹${days * 22000}`,
+    accommodations: master?.hotels?.[cat.hotelCat]?.map((h: any) => h.name).join(', ') || `Curated ${cat.budget} stays in ${name}`,
+    highlights: master?.highlights && master.highlights.length > 0 ? master.highlights.slice(0, 4) : [master?.morning, master?.afternoon, master?.evening].filter(Boolean),
+    bestFor: cat.id.includes('budget') ? 'Solo explorers & Backpackers' : cat.id.includes('luxury') ? 'Luxury seekers' : 'Families & Couples',
+    days: Array.from({ length: days }, (_, i) => ({
+      day: i + 1,
+      title: i === 0 ? `Arrival & Initial ${name} Discovery` : i === days - 1 ? `Final Memories & ${name} Farewell` : `Deep Dive: ${name} Core Experience`,
+      places: [
+        master?.morning || 'Local Heritage Site',
+        master?.afternoon || 'Main Attraction',
+        master?.evening || 'Scenic Point'
+      ],
+      route: 'Hotel → Local Highlights → Regional Eatery → Hotel',
+      activities: [
+        `Morning: ${master?.morning || 'Sightseeing'}`,
+        `Afternoon: ${master?.afternoon || 'Local Excursion'}`,
+        `Evening: ${master?.evening || 'Leisure & Lights'}`
+      ]
+    }))
+  }));
+}
 
 // ── Destination hero images ───────────────────────────────────────────────────
 const DEST_IMAGES: Record<string, string> = {
@@ -93,14 +135,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Connect to DB for master data
+    await connectDB();
+    
+    // Smarter lookup: check full name OR just the city part (e.g., "Ahmedabad" from "Ahmedabad, India")
+    const cityName = destination.split(',')[0].trim();
+    const master = await Destination.findOne({
+      $or: [
+        { name: { $regex: new RegExp(`^${destination}$`, 'i') } },
+        { displayName: { $regex: new RegExp(`^${destination}$`, 'i') } },
+        { name: { $regex: new RegExp(`^${cityName}$`, 'i') } },
+        { displayName: { $regex: new RegExp(`^${cityName}$`, 'i') } }
+      ]
+    });
+
     // ── Toggle: Mock vs AI ──
     const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'false';
     const apiKey = process.env.OPENAI_API_KEY ?? '';
 
-    // If Mock mode is ON or API key is missing, return mock data immediately
+    // If Mock mode is ON or API key is missing, return DB/Mock data immediately
     if (useMock || !apiKey || apiKey.length < 20) {
-      console.log(`[plans/generate] Mode: ${useMock ? 'FORCE_MOCK' : 'FALLBACK_MOCK'} (Key: ${!!apiKey})`);
-      const plans = generateMockPlans(destination, numDays);
+      console.log(`[plans/generate] Mode: ${master ? 'REGISTRY' : 'MOCK'} (Query: ${destination})`);
+      
+      const plans = master 
+        ? generatePlansFromMaster(destination, numDays, master)
+        : generateMockPlans(destination, numDays);
       const destImage = getDestinationImage(destination);
       const plansWithImage = plans.map((p: any) => ({
         ...p,
@@ -108,9 +167,9 @@ export async function POST(req: NextRequest) {
       }));
       return NextResponse.json({ 
         plans: plansWithImage, 
-        source: 'mock',
+        source: master ? 'database' : 'mock',
         isMock: true,
-        message: useMock ? 'Using development mock data' : 'Fallback to mock data (API key missing)'
+        message: master ? 'Using registry-driven plans' : 'Using development mock data'
       });
     }
 
