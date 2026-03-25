@@ -14,6 +14,7 @@ async function seed() {
     const admin = await User.create({
         name: 'Admin User',
         email: 'admin@gmail.com',
+        phoneNumber: '9876543210',
         password: 'admin123',
         role: 'admin'
     });
@@ -21,6 +22,7 @@ async function seed() {
     const cc = await User.create({
         name: 'Sarah Johnson',
         email: 'sarah@travel.com',
+        phoneNumber: '9123456789',
         password: 'care123',
         role: 'customer_care'
     });
