@@ -33,9 +33,4 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string) 
 
 const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
-// Force refresh in case of enum changes during dev
-if (process.env.NODE_ENV === 'development') {
-    delete (mongoose.models as any).User;
-}
-
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+export default User;

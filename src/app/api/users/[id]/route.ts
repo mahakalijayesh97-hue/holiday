@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { name, email, role, password } = await req.json();
+        const { name, email, role, password, phoneNumber } = await req.json();
 
         await connectDB();
         const user = await User.findById(id);
@@ -23,6 +23,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         user.name = name || user.name;
         user.email = email || user.email;
         user.role = role || user.role;
+        if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
 
         if (password) {
             user.password = password; // Pre-save hook will hash this
