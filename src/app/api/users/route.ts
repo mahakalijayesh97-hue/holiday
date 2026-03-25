@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
         const filter: Record<string, unknown> = {};
         if (role) filter.role = role;
 
-        const users = await User.find(filter).select('name email role createdAt').sort({ name: 1 });
+        const users = await User.find(filter).select('name email phoneNumber role createdAt').sort({ name: 1 });
         return NextResponse.json({ users });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { name, email, password, role } = await req.json();
+        const { name, email, phoneNumber, password, role } = await req.json();
 
         if (!name || !email || !password || !role) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'User already exists' }, { status: 400 });
         }
 
-        const newUser = await User.create({ name, email, password, role });
+        const newUser = await User.create({ name, email, phoneNumber, password, role });
         return NextResponse.json({ message: 'User created successfully', userId: newUser._id }, { status: 201 });
     } catch (error) {
         console.error('Create user error:', error);

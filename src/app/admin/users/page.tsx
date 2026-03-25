@@ -12,6 +12,7 @@ interface User {
     _id: string;
     name: string;
     email: string;
+    phoneNumber?: string;
     role: 'admin' | 'customer_care';
     createdAt: string;
 }
@@ -23,7 +24,7 @@ export default function UserManagementPage() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'customer_care' });
+    const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
@@ -68,7 +69,7 @@ export default function UserManagementPage() {
                 toast.success(editingUser ? 'User updated' : 'User created');
                 setIsModalOpen(false);
                 setEditingUser(null);
-                setFormData({ name: '', email: '', password: '', role: 'customer_care' });
+                setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
                 fetchUsers();
             } else {
                 toast.error(data.error || 'Operation failed');
@@ -98,7 +99,7 @@ export default function UserManagementPage() {
 
     const openEditModal = (user: User) => {
         setEditingUser(user);
-        setFormData({ name: user.name, email: user.email, password: '', role: user.role });
+        setFormData({ name: user.name, email: user.email, phoneNumber: user.phoneNumber || '', password: '', role: user.role });
         setIsModalOpen(true);
     };
 
@@ -117,7 +118,7 @@ export default function UserManagementPage() {
                     <button
                         onClick={() => {
                             setEditingUser(null);
-                            setFormData({ name: '', email: '', password: '', role: 'customer_care' });
+                            setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
                             setIsModalOpen(true);
                         }}
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-bold shadow-lg shadow-purple-900/20 hover:scale-105 transition-all"
@@ -136,6 +137,7 @@ export default function UserManagementPage() {
                                     <tr>
                                         <th className="px-6 py-4 font-semibold">Staff Member</th>
                                         <th className="px-6 py-4 font-semibold">Role</th>
+                                        <th className="px-6 py-4 font-semibold">Phone Number</th>
                                         <th className="px-6 py-4 font-semibold">Created</th>
                                         <th className="px-6 py-4 font-semibold text-right">Actions</th>
                                     </tr>
@@ -162,6 +164,9 @@ export default function UserManagementPage() {
                                                     <Shield className="w-3 h-3" />
                                                     {user.role === 'admin' ? 'Administrator' : 'Customer Care'}
                                                 </span>
+                                            </td>
+                                            <td className="px-6 py-5 text-sm text-gray-400">
+                                                {user.phoneNumber || '-'}
                                             </td>
                                             <td className="px-6 py-5 text-sm text-gray-400">
                                                 {new Date(user.createdAt).toLocaleDateString()}
@@ -235,6 +240,17 @@ export default function UserManagementPage() {
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
                                     placeholder="••••••••"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1.5">Phone Number</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={formData.phoneNumber}
+                                    onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                    className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+                                    placeholder="Phone Number"
                                 />
                             </div>
                             <div>
