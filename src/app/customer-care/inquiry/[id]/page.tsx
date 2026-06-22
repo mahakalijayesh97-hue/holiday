@@ -28,6 +28,31 @@ export default function CCInquiryDetailPage() {
     const [loading, setLoading] = useState(true);
     const [newNote, setNewNote] = useState('');
     const [updating, setUpdating] = useState(false);
+    const [timeLeft, setTimeLeft] = useState<number>(0);
+
+    const isPendingAcceptance = inquiry && 
+        inquiry.status === 'Pending' && 
+        !inquiry.assignmentAccepted && 
+        inquiry.assignedTo?._id === (session?.user as any)?.id;
+
+    useEffect(() => {
+        if (!inquiry || !inquiry.assignmentExpiresAt || !isPendingAcceptance) {
+            setTimeLeft(0);
+            return;
+        }
+
+        const expiresAt = new Date(inquiry.assignmentExpiresAt).getTime();
+
+        const updateTimer = () => {
+            const now = Date.now();
+            const diff = Math.max(0, Math.round((expiresAt - now) / 1000));
+            setTimeLeft(diff);
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+        return () => clearInterval(interval);
+    }, [inquiry, isPendingAcceptance]);
 
     useEffect(() => {
         const fetchInquiry = async () => {
@@ -127,6 +152,46 @@ export default function CCInquiryDetailPage() {
                             </div>
                         </div>
 
+                        {/* Accept Assignment Banner */}
+                        {isPendingAcceptance && timeLeft > 0 && (
+                            <div className="glass p-8 border-2 border-red-500/40 rounded-3xl bg-gradient-to-r from-red-950/40 via-red-900/30 to-amber-900/20 flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 animate-pulse">
+                                <div>
+                                    <h2 className="text-xl font-black text-white">Accept Inquiry Request</h2>
+                                    <p className="text-sm text-gray-400 mt-1">Please accept this inquiry before the time expires to start planning the itinerary.</p>
+                                </div>
+                                <div className="flex items-center gap-4 shrink-0">
+                                    <div className="bg-gray-950 border border-gray-800 px-4 py-2 rounded-xl text-center">
+                                        <span className="text-[10px] text-gray-500 uppercase font-black block mb-1">Expires In</span>
+                                        <span className="text-xl font-bold font-mono text-red-500">{timeLeft}s</span>
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            setUpdating(true);
+                                            try {
+                                                const res = await fetch(`/api/inquiries/${id}`, {
+                                                    method: 'PATCH',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ assignmentAccepted: true })
+                                                });
+                                                const data = await res.json();
+                                                if (data.inquiry) {
+                                                    setInquiry(data.inquiry);
+                                                    toast.success('Assignment accepted!');
+                                                }
+                                            } catch (err) {
+                                                toast.error('Failed to accept assignment');
+                                            } finally {
+                                                setUpdating(false);
+                                            }
+                                        }}
+                                        className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl shadow-lg shadow-red-900/20 hover:scale-105 transition-all text-sm uppercase tracking-wider"
+                                    >
+                                        Accept Assignment
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Selected Plan Details */}
                         <div className="card">
                             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -166,7 +231,7 @@ export default function CCInquiryDetailPage() {
                                     <button
                                         key={s}
                                         onClick={() => handleUpdate({ status: s })}
-                                        disabled={updating}
+                                        disabled={updating || isPendingAcceptance}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${inquiry.status === s
                                                 ? 'bg-blue-600 text-white shadow-lg'
                                                 : 'bg-gray-800 text-gray-500 hover:text-white'
@@ -200,15 +265,16 @@ export default function CCInquiryDetailPage() {
 
                             <div className="relative">
                                 <textarea
-                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs outline-none focus:border-blue-500 min-h-[80px]"
-                                    placeholder="Add a progress update..."
+                                    className="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs outline-none focus:border-blue-500 min-h-[80px] disabled:opacity-50"
+                                    placeholder={isPendingAcceptance ? "Accept assignment to add notes..." : "Add a progress update..."}
                                     value={newNote}
                                     onChange={(e) => setNewNote(e.target.value)}
+                                    disabled={updating || isPendingAcceptance}
                                 />
                                 <button
                                     onClick={addNote}
-                                    disabled={!newNote.trim() || updating}
-                                    className="absolute bottom-3 right-3 p-1.5 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors"
+                                    disabled={!newNote.trim() || updating || isPendingAcceptance}
+                                    className="absolute bottom-3 right-3 p-1.5 bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors disabled:opacity-50"
                                 >
                                     <Send className="w-4 h-4" />
                                 </button>
@@ -221,8 +287,8 @@ export default function CCInquiryDetailPage() {
                                 <CalendarClock className="w-4 h-4 text-blue-400" /> Set Follow-up Call
                             </h3>
                             <div className="space-y-3">
-                                <input type="datetime-local" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs" />
-                                <button className="w-full py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold hover:bg-blue-600/30 transition-all">
+                                <input type="datetime-local" className="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs disabled:opacity-50" disabled={updating || isPendingAcceptance} />
+                                <button disabled={updating || isPendingAcceptance} className="w-full py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold hover:bg-blue-600/30 transition-all disabled:opacity-50">
                                     Set Appointment
                                 </button>
                             </div>

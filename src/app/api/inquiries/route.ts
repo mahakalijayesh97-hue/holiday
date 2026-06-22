@@ -2,23 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Inquiry from '@/models/Inquiry';
 import { nanoid } from 'nanoid';
+import { assignInquiryToAgent, checkAndReassignExpiredInquiries } from '@/lib/assignment';
 
 // GET /api/inquiries — list all inquiries (admin)
 export async function GET(req: NextRequest) {
     try {
         await connectDB();
+        await checkAndReassignExpiredInquiries();
         const { searchParams } = new URL(req.url);
         const status = searchParams.get('status');
         const assignedTo = searchParams.get('assignedTo');
         const search = searchParams.get('search');
         const email = searchParams.get('email');
 
-        const filter: Record<string, any> = {};
-        if (status) filter.status = status;
-        if (assignedTo) filter.assignedTo = assignedTo;
-        if (email) filter.email = email;
-
-        // Security: If not admin/staff, only allow viewing own inquiries
         const { getServerSession } = await import('next-auth');
         const { authOptions } = await import('@/lib/auth');
         const session = await getServerSession(authOptions);
@@ -30,24 +26,67 @@ export async function GET(req: NextRequest) {
         const userRole = (session.user as any)?.role;
         const userEmail = session.user?.email;
 
+        const conditions: any[] = [];
+
+        // Base query parameters
+        const baseFilter: Record<string, any> = {};
+        if (status) baseFilter.status = status;
+        if (assignedTo) baseFilter.assignedTo = assignedTo;
+        if (email) baseFilter.email = email;
+
+        if (Object.keys(baseFilter).length > 0) {
+            conditions.push(baseFilter);
+        }
+
+        // Security role filtering
         if (userRole === 'customer') {
-            // Force filter to only their own email
-            filter.email = userEmail;
-            // Remove other filters that might leak info
-            delete filter.assignedTo;
-            if (filter.$or) delete filter.$or;
+            conditions.push({ email: userEmail });
+        } else if (userRole === 'customer_care') {
+            const User = (await import('@/models/User')).default;
+            const Destination = (await import('@/models/Destination')).default;
+            const userDoc = await User.findById((session.user as any).id);
+            if (userDoc) {
+                const allowedDestinations = await Destination.find({
+                    $or: [
+                        { displayName: { $in: userDoc.assignedLocations || [] } },
+                        { region: { $in: userDoc.assignedAreas || [] } },
+                        { type: { $in: userDoc.assignedAreas || [] } }
+                    ]
+                });
+                
+                const allowedNames = allowedDestinations.map(d => d.displayName);
+                const allowedSlugs = allowedDestinations.map(d => d.name);
+                const allAllowed = Array.from(new Set([
+                    ...allowedNames,
+                    ...allowedSlugs,
+                    ...(userDoc.assignedLocations || [])
+                ]));
+                
+                const caseInsensitiveRegex = allAllowed.map(name => new RegExp('^' + name + '$', 'i'));
+                
+                conditions.push({
+                    $or: [
+                        { assignedTo: (session.user as any).id },
+                        { destination: { $in: caseInsensitiveRegex } }
+                    ]
+                });
+            }
         }
 
+        // Search parameter filtering
         if (search && userRole !== 'customer') {
-            filter.$or = [
-                { inquiryId: { $regex: search, $options: 'i' } },
-                { name: { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } },
-                { phone: { $regex: search, $options: 'i' } },
-            ];
+            conditions.push({
+                $or: [
+                    { inquiryId: { $regex: search, $options: 'i' } },
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { phone: { $regex: search, $options: 'i' } },
+                ]
+            });
         }
 
-        const inquiries = await Inquiry.find(filter)
+        const query = conditions.length > 0 ? { $and: conditions } : {};
+        const inquiries = await Inquiry.find(query)
             .populate('assignedTo', 'name email role')
             .sort({ createdAt: -1 });
 
@@ -81,6 +120,8 @@ export async function POST(req: NextRequest) {
             selectedPlan,
             status: 'Pending',
         });
+
+        await assignInquiryToAgent(inquiry);
 
         return NextResponse.json({ inquiry, inquiryId }, { status: 201 });
     } catch (error) {

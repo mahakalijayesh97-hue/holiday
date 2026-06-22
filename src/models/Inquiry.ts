@@ -41,7 +41,10 @@ export interface IInquiry extends Document {
     days: number;
     selectedPlan: ITravelPlan;
     status: 'Pending' | 'In Progress' | 'Completed';
-    assignedTo?: mongoose.Types.ObjectId;
+    assignedTo?: mongoose.Types.ObjectId | null;
+    assignmentExpiresAt?: Date | null;
+    assignmentAccepted?: boolean;
+    previouslyAssignedTo: mongoose.Types.ObjectId[];
     notes: INote[];
     meetings: IMeeting[];
     createdAt: Date;
@@ -95,6 +98,9 @@ const InquirySchema = new Schema<IInquiry>(
             default: 'Pending',
         },
         assignedTo: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+        assignmentExpiresAt: { type: Date, default: null },
+        assignmentAccepted: { type: Boolean, default: false },
+        previouslyAssignedTo: { type: [{ type: Schema.Types.ObjectId, ref: 'User' }], default: [] },
         notes: [NoteSchema],
         meetings: [MeetingSchema],
     },

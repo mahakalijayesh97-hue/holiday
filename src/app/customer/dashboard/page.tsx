@@ -15,27 +15,37 @@ export default function CustomerDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let active = true;
+        const fetchInquiries = async () => {
+            try {
+                const res = await fetch('/api/inquiries');
+                const data = await res.json();
+                if (active && data.inquiries) {
+                    setInquiries(data.inquiries);
+                }
+            } catch (error) {
+                console.error('Failed to load inquiries', error);
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
+
         if (status === 'unauthenticated') {
             router.push('/login');
         } else if (status === 'authenticated') {
             const role = (session?.user as any)?.role;
             if (role === 'admin') router.push('/admin/dashboard');
             else if (role === 'customer_care') router.push('/customer-care/dashboard');
-            else fetchInquiries();
+            else {
+                fetchInquiries();
+                const interval = setInterval(fetchInquiries, 3000);
+                return () => {
+                    active = false;
+                    clearInterval(interval);
+                };
+            }
         }
     }, [status, session, router]);
-
-    const fetchInquiries = async () => {
-        try {
-            const res = await fetch('/api/inquiries');
-            const data = await res.json();
-            setInquiries(data.inquiries || []);
-        } catch (error) {
-            console.error('Failed to load inquiries');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (status === 'loading' || loading) return <LoadingSpinner text="Loading your travel plans..." />;
 
@@ -66,12 +76,17 @@ export default function CustomerDashboard() {
                         {inquiries.map((inq) => (
                             <div key={inq._id} className="glass p-6 rounded-3xl group hover:border-purple-500/50 transition-all border-purple-500/10 relative overflow-hidden flex flex-col">
                                 <div className="absolute top-0 right-0 p-3">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-gray-800 border border-gray-700 ${
-                                        inq.status === 'Completed' ? 'text-emerald-400' : 
-                                        inq.status === 'In Progress' ? 'text-blue-400' : 'text-yellow-500'
-                                    }`}>
-                                        {inq.status}
-                                    </span>
+                                    {inq.status === 'Pending' ? (
+                                        <span className="text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                                            Pending Assignment
+                                        </span>
+                                    ) : (
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-gray-800 border border-gray-700 ${
+                                            inq.status === 'Completed' ? 'text-emerald-400' : 'text-blue-400'
+                                        }`}>
+                                            {inq.status}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div className="mb-4">
@@ -79,6 +94,11 @@ export default function CustomerDashboard() {
                                     <h3 className="text-xl font-bold flex items-center gap-2 mt-1 lowercase first-letter:uppercase">
                                         <MapPin className="w-4 h-4 text-purple-400" /> {inq.destination}
                                     </h3>
+                                    {inq.status === 'Pending' && (
+                                        <p className="text-[11px] text-yellow-500/90 bg-yellow-500/5 border border-yellow-500/10 rounded-lg p-2.5 mt-3 leading-normal font-medium">
+                                            Pending – Your request is being assigned to an available Customer Care Executive.
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="space-y-3 mb-6 flex-1">
