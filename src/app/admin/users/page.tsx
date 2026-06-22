@@ -14,6 +14,9 @@ interface User {
     email: string;
     phoneNumber?: string;
     role: 'admin' | 'customer_care';
+    assignedLocations?: string[];
+    assignedAreas?: string[];
+    isAvailable?: number;
     createdAt: string;
 }
 
@@ -24,8 +27,9 @@ export default function UserManagementPage() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
+    const [formData, setFormData] = useState({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care', assignedLocations: [] as string[], assignedAreas: [] as string[] });
     const [submitting, setSubmitting] = useState(false);
+    const [availableDestinations, setAvailableDestinations] = useState<any[]>([]);
 
     useEffect(() => {
         if (status === 'unauthenticated' || (status === 'authenticated' && (session?.user as any)?.role !== 'admin')) {
@@ -36,8 +40,22 @@ export default function UserManagementPage() {
     useEffect(() => {
         if (status === 'authenticated' && (session?.user as any)?.role === 'admin') {
             fetchUsers();
+            fetchDestinations();
         }
     }, [status, session]);
+
+    const fetchDestinations = async () => {
+        try {
+            const res = await fetch('/api/destinations');
+            const data = await res.json();
+            if (data.destinations) setAvailableDestinations(data.destinations);
+        } catch (error) {
+            console.error('Failed to load destinations');
+        }
+    };
+
+    const uniqueLocations = Array.from(new Set(availableDestinations.map(d => d.displayName))).sort();
+    const uniqueAreas = Array.from(new Set(availableDestinations.map(d => d.region || d.type).filter(Boolean))).sort();
 
     const fetchUsers = async () => {
         try {
@@ -69,7 +87,7 @@ export default function UserManagementPage() {
                 toast.success(editingUser ? 'User updated' : 'User created');
                 setIsModalOpen(false);
                 setEditingUser(null);
-                setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
+                setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care', assignedLocations: [], assignedAreas: [] });
                 fetchUsers();
             } else {
                 toast.error(data.error || 'Operation failed');
@@ -99,7 +117,15 @@ export default function UserManagementPage() {
 
     const openEditModal = (user: User) => {
         setEditingUser(user);
-        setFormData({ name: user.name, email: user.email, phoneNumber: user.phoneNumber || '', password: '', role: user.role });
+        setFormData({
+            name: user.name,
+            email: user.email,
+            phoneNumber: user.phoneNumber || '',
+            password: '',
+            role: user.role,
+            assignedLocations: user.assignedLocations || [],
+            assignedAreas: user.assignedAreas || []
+        });
         setIsModalOpen(true);
     };
 
@@ -118,7 +144,7 @@ export default function UserManagementPage() {
                     <button
                         onClick={() => {
                             setEditingUser(null);
-                            setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care' });
+                            setFormData({ name: '', email: '', phoneNumber: '', password: '', role: 'customer_care', assignedLocations: [], assignedAreas: [] });
                             setIsModalOpen(true);
                         }}
                         className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-bold shadow-lg shadow-purple-900/20 hover:scale-105 transition-all"
@@ -153,13 +179,27 @@ export default function UserManagementPage() {
                                                     <div>
                                                         <div className="font-bold text-gray-100">{user.name}</div>
                                                         <div className="text-sm text-gray-500">{user.email}</div>
+                                                        {user.role === 'customer_care' && (
+                                                            <div className="mt-2 flex flex-wrap gap-1 max-w-xs">
+                                                                {(user.assignedLocations || []).map(loc => (
+                                                                    <span key={loc} className="text-[9px] font-bold uppercase tracking-tight bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded-md">
+                                                                        📍 {loc}
+                                                                    </span>
+                                                                ))}
+                                                                {(user.assignedAreas || []).map(area => (
+                                                                    <span key={area} className="text-[9px] font-bold uppercase tracking-tight bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md">
+                                                                        🌐 {area}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${user.role === 'admin'
-                                                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-                                                        : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                                    ? 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                                                    : 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                                                     }`}>
                                                     <Shield className="w-3 h-3" />
                                                     {user.role === 'admin' ? 'Administrator' : 'Customer Care'}
@@ -199,14 +239,14 @@ export default function UserManagementPage() {
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="bg-gray-900 border border-gray-700 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
-                        <div className="p-6 border-b border-gray-800 flex items-center justify-between bg-gradient-to-r from-gray-800 to-gray-900">
+                    <div className="bg-gray-900 border border-gray-700 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in max-h-[90vh] flex flex-col">
+                        <div className="p-6 border-b border-gray-800 flex items-center justify-between bg-gradient-to-r from-gray-800 to-gray-900 shrink-0">
                             <h2 className="text-xl font-bold">{editingUser ? 'Edit Staff Member' : 'Add New Staff'}</h2>
                             <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
                             <div>
                                 <label className="block text-sm font-medium text-gray-400 mb-1.5">Full Name</label>
                                 <input
@@ -264,6 +304,66 @@ export default function UserManagementPage() {
                                     <option value="admin" className="bg-gray-800 text-white">Administrator</option>
                                 </select>
                             </div>
+                            {formData.role === 'customer_care' && (
+                                <div className="space-y-4 border-t border-gray-800 pt-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-400 mb-1.5">Assign Locations (Destinations)</label>
+                                        <div className="bg-gray-950 border border-gray-800 rounded-xl p-3 max-h-32 overflow-y-auto grid grid-cols-2 gap-1.5 custom-scrollbar">
+                                            {uniqueLocations.length === 0 && <span className="col-span-2 text-xs text-gray-600 italic">No locations found</span>}
+                                            {uniqueLocations.map(loc => {
+                                                const checked = formData.assignedLocations.includes(loc);
+                                                return (
+                                                    <label key={loc} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[10px] cursor-pointer select-none transition-all ${checked
+                                                            ? 'bg-purple-600/20 border-purple-500 text-white font-bold'
+                                                            : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-white'
+                                                        }`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={checked}
+                                                            onChange={(e) => {
+                                                                const next = e.target.checked
+                                                                    ? [...formData.assignedLocations, loc]
+                                                                    : formData.assignedLocations.filter(x => x !== loc);
+                                                                setFormData(prev => ({ ...prev, assignedLocations: next }));
+                                                            }}
+                                                        />
+                                                        {loc}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold text-gray-400 mb-1.5">Assign Areas (Regions / Types)</label>
+                                        <div className="bg-gray-950 border border-gray-800 rounded-xl p-3 max-h-32 overflow-y-auto grid grid-cols-2 gap-1.5 custom-scrollbar">
+                                            {uniqueAreas.length === 0 && <span className="col-span-2 text-xs text-gray-600 italic">No areas found</span>}
+                                            {uniqueAreas.map(area => {
+                                                const checked = formData.assignedAreas.includes(area);
+                                                return (
+                                                    <label key={area} className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[10px] cursor-pointer select-none transition-all ${checked
+                                                            ? 'bg-blue-600/20 border-blue-500 text-white font-bold'
+                                                            : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-white'
+                                                        }`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="hidden"
+                                                            checked={checked}
+                                                            onChange={(e) => {
+                                                                const next = e.target.checked
+                                                                    ? [...formData.assignedAreas, area]
+                                                                    : formData.assignedAreas.filter(x => x !== area);
+                                                                setFormData(prev => ({ ...prev, assignedAreas: next }));
+                                                            }}
+                                                        />
+                                                        {area}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                             <div className="pt-4 flex gap-3">
                                 <button
                                     type="button"

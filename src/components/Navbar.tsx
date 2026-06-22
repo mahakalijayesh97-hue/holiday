@@ -117,7 +117,21 @@ export default function Navbar({ variant = 'public' }: NavbarProps) {
                                         </div>
                                         <div className="p-2">
                                             <button
-                                                onClick={() => signOut({ callbackUrl: '/login' })}
+                                                onClick={async () => {
+                                                    if ((session?.user as any)?.role === 'customer_care' && (session?.user as any)?.id) {
+                                                        try {
+                                                            const userId = (session.user as any).id;
+                                                            await fetch(`/api/users/${userId}`, {
+                                                                method: 'PUT',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ isAvailable: 0 })
+                                                            });
+                                                        } catch (e) {
+                                                            console.error('Failed to set offline on logout', e);
+                                                        }
+                                                    }
+                                                    signOut({ callbackUrl: '/login' });
+                                                }}
                                                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all font-bold group"
                                             >
                                                 <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />

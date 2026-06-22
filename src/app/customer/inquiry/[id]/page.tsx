@@ -23,10 +23,12 @@ export default function CustomerInquiryDetailPage() {
     }, [status, router]);
 
     useEffect(() => {
-        const fetchInquiry = async () => {
+        let active = true;
+        const fetchInquiry = async (showToastOnUpdate = false) => {
             try {
                 const res = await fetch(`/api/inquiries/${id}`);
                 const data = await res.json();
+                if (!active) return;
                 
                 // Security check on client side just in case (API also handles it)
                 if (data.inquiry && data.inquiry.email !== session?.user?.email && (session?.user as any)?.role === 'customer') {
@@ -35,16 +37,32 @@ export default function CustomerInquiryDetailPage() {
                     return;
                 }
                 
-                setInquiry(data.inquiry);
+                if (data.inquiry) {
+                    setInquiry((prev: any) => {
+                        if (showToastOnUpdate && prev && prev.status === 'Pending' && data.inquiry.status === 'In Progress') {
+                            toast.success('Your trip request has been accepted by a Customer Care Executive!', { duration: 5000 });
+                        }
+                        return data.inquiry;
+                    });
+                }
             } catch (error) {
-                toast.error('Failed to load trip details');
+                console.error('Failed to load trip details', error);
             } finally {
                 setLoading(false);
             }
         };
 
         if (session && status === 'authenticated') {
-            fetchInquiry();
+            fetchInquiry(false);
+
+            const interval = setInterval(() => {
+                fetchInquiry(true);
+            }, 3000);
+
+            return () => {
+                active = false;
+                clearInterval(interval);
+            };
         }
     }, [id, session, status, router]);
 
@@ -80,7 +98,7 @@ export default function CustomerInquiryDetailPage() {
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-gray-800">
                             <div>
                                 <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Status</p>
-                                <StatusBadge status={inquiry.status} />
+                                <StatusBadge status={inquiry.status} verbose={true} />
                             </div>
                             <div>
                                 <p className="text-[10px] text-gray-500 uppercase font-black mb-1">Duration</p>

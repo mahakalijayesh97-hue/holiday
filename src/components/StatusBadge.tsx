@@ -8,12 +8,15 @@ const statusConfig: Record<Status, { color: string; dot: string; label: string }
     Completed: { color: 'bg-green-500/10 text-green-400 border-green-500/30', dot: 'bg-green-400', label: 'Completed' },
 };
 
-export default function StatusBadge({ status }: { status: string }) {
+export default function StatusBadge({ status, verbose = false }: { status: string; verbose?: boolean }) {
     const config = statusConfig[status as Status] ?? statusConfig['Pending'];
+    const label = (status === 'Pending' && verbose)
+        ? 'Pending – Your request is being assigned to an available Customer Care Executive.'
+        : config.label;
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${config.color}`}>
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${config.dot}`} />
-            {config.label}
+            {label}
         </span>
     );
 }

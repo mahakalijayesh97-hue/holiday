@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import Inquiry from '@/models/Inquiry';
+import { checkAndReassignExpiredInquiries } from '@/lib/assignment';
 
 export async function GET(
     req: Request, 
@@ -9,6 +10,7 @@ export async function GET(
     try {
         const { id } = await params;
         await connectDB();
+        await checkAndReassignExpiredInquiries();
         const inquiry = await Inquiry.findById(id).populate('assignedTo', 'name email role');
         if (!inquiry) return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
         return NextResponse.json({ inquiry });
@@ -25,13 +27,20 @@ export async function PATCH(
         const { id } = await params;
         await connectDB();
         const body = await req.json();
-        const { status, assignedTo, note, noteAuthor, meeting } = body;
+        const { status, assignedTo, note, noteAuthor, meeting, assignmentAccepted } = body;
 
         const inquiry = await Inquiry.findById(id);
         if (!inquiry) return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
 
         if (status) inquiry.status = status;
         if (assignedTo !== undefined) inquiry.assignedTo = assignedTo || null;
+        if (assignmentAccepted !== undefined) {
+            inquiry.assignmentAccepted = assignmentAccepted;
+            if (assignmentAccepted) {
+                inquiry.status = 'In Progress';
+                inquiry.assignmentExpiresAt = null;
+            }
+        }
 
         if (note) {
             inquiry.notes.push({ text: note, author: noteAuthor || 'Admin', createdAt: new Date() });

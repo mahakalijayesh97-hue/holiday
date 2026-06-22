@@ -7,6 +7,10 @@ export interface IUser extends Document {
     phoneNumber?: string;
     password: string;
     role: 'admin' | 'customer_care' | 'customer';
+    assignedLocations: string[];
+    assignedAreas: string[];
+    isAvailable: number;
+    lastAssignedAt?: Date | null;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -17,6 +21,10 @@ const UserSchema = new Schema<IUser>(
         phoneNumber: { type: String },
         password: { type: String, required: true },
         role: { type: String, enum: ['admin', 'customer_care', 'customer'], default: 'customer' },
+        assignedLocations: { type: [String], default: [] },
+        assignedAreas: { type: [String], default: [] },
+        isAvailable: { type: Number, default: 1 },
+        lastAssignedAt: { type: Date, default: null },
     },
     { timestamps: true }
 );
